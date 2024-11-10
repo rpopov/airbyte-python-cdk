@@ -5,7 +5,13 @@ import logging
 from typing import Any, Iterable, List, Mapping, Optional, Set, Tuple
 from unittest import TestCase, mock
 
-from airbyte_cdk import AbstractSource, DeclarativeStream, SinglePartitionRouter, Stream, StreamSlice
+from airbyte_cdk import (
+    AbstractSource,
+    DeclarativeStream,
+    SinglePartitionRouter,
+    Stream,
+    StreamSlice,
+)
 from airbyte_cdk.models import ConnectorSpecification
 from airbyte_cdk.sources.declarative.async_job.job import AsyncJob
 from airbyte_cdk.sources.declarative.async_job.job_orchestrator import AsyncJobOrchestrator
@@ -50,7 +56,9 @@ class MockSource(AbstractSource):
         self._stream_slicer = SinglePartitionRouter({}) if stream_slicer is None else stream_slicer
         self._message_repository = NoopMessageRepository()
 
-    def check_connection(self, logger: logging.Logger, config: Mapping[str, Any]) -> Tuple[bool, Optional[Any]]:
+    def check_connection(
+        self, logger: logging.Logger, config: Mapping[str, Any]
+    ) -> Tuple[bool, Optional[Any]]:
         return True, None
 
     def spec(self, logger: logging.Logger) -> ConnectorSpecification:
@@ -101,7 +109,11 @@ class JobDeclarativeStreamTest(TestCase):
 
     def test_when_read_then_return_records_from_repository(self) -> None:
         output = read(
-            self._source, self._CONFIG, CatalogBuilder().with_stream(ConfiguredAirbyteStreamBuilder().with_name(_A_STREAM_NAME)).build()
+            self._source,
+            self._CONFIG,
+            CatalogBuilder()
+            .with_stream(ConfiguredAirbyteStreamBuilder().with_name(_A_STREAM_NAME))
+            .build(),
         )
 
         assert len(output.records) == 1
@@ -111,7 +123,11 @@ class JobDeclarativeStreamTest(TestCase):
         As generating stream slices is very expensive, we want to ensure that during a read, it is only called once.
         """
         output = read(
-            self._source, self._CONFIG, CatalogBuilder().with_stream(ConfiguredAirbyteStreamBuilder().with_name(_A_STREAM_NAME)).build()
+            self._source,
+            self._CONFIG,
+            CatalogBuilder()
+            .with_stream(ConfiguredAirbyteStreamBuilder().with_name(_A_STREAM_NAME))
+            .build(),
         )
 
         assert not output.errors

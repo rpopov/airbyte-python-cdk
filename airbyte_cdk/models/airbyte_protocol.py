@@ -42,7 +42,11 @@ class AirbyteStateBlob:
             setattr(self, key, value)
 
     def __eq__(self, other: object) -> bool:
-        return False if not isinstance(other, AirbyteStateBlob) else bool(self.__dict__ == other.__dict__)
+        return (
+            False
+            if not isinstance(other, AirbyteStateBlob)
+            else bool(self.__dict__ == other.__dict__)
+        )
 
 
 # The following dataclasses have been redeclared to include the new version of AirbyteStateBlob

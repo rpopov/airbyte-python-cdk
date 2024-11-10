@@ -6,8 +6,13 @@ from dataclasses import InitVar, dataclass
 from typing import Any, Mapping, MutableMapping, Optional, Union
 
 from airbyte_cdk.sources.declarative.interpolation.interpolated_string import InterpolatedString
-from airbyte_cdk.sources.declarative.requesters.request_option import RequestOption, RequestOptionType
-from airbyte_cdk.sources.declarative.requesters.request_options.request_options_provider import RequestOptionsProvider
+from airbyte_cdk.sources.declarative.requesters.request_option import (
+    RequestOption,
+    RequestOptionType,
+)
+from airbyte_cdk.sources.declarative.requesters.request_options.request_options_provider import (
+    RequestOptionsProvider,
+)
 from airbyte_cdk.sources.types import Config, StreamSlice, StreamState
 
 
@@ -26,8 +31,12 @@ class DatetimeBasedRequestOptionsProvider(RequestOptionsProvider):
     partition_field_end: Optional[str] = None
 
     def __post_init__(self, parameters: Mapping[str, Any]) -> None:
-        self._partition_field_start = InterpolatedString.create(self.partition_field_start or "start_time", parameters=parameters)
-        self._partition_field_end = InterpolatedString.create(self.partition_field_end or "end_time", parameters=parameters)
+        self._partition_field_start = InterpolatedString.create(
+            self.partition_field_start or "start_time", parameters=parameters
+        )
+        self._partition_field_end = InterpolatedString.create(
+            self.partition_field_end or "end_time", parameters=parameters
+        )
 
     def get_request_params(
         self,
@@ -65,7 +74,9 @@ class DatetimeBasedRequestOptionsProvider(RequestOptionsProvider):
     ) -> Mapping[str, Any]:
         return self._get_request_options(RequestOptionType.body_json, stream_slice)
 
-    def _get_request_options(self, option_type: RequestOptionType, stream_slice: Optional[StreamSlice]) -> Mapping[str, Any]:
+    def _get_request_options(
+        self, option_type: RequestOptionType, stream_slice: Optional[StreamSlice]
+    ) -> Mapping[str, Any]:
         options: MutableMapping[str, Any] = {}
         if not stream_slice:
             return options

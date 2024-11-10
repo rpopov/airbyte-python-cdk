@@ -13,7 +13,9 @@ class LocalProcessingConfigModel(BaseModel):
 
     class Config(OneOfOptionConfig):
         title = "Local"
-        description = "Process files locally, supporting `fast` and `ocr` modes. This is the default option."
+        description = (
+            "Process files locally, supporting `fast` and `ocr` modes. This is the default option."
+        )
         discriminator = "mode"
 
 
@@ -23,7 +25,9 @@ class APIParameterConfigModel(BaseModel):
         description="The name of the unstructured API parameter to use",
         examples=["combine_under_n_chars", "languages"],
     )
-    value: str = Field(title="Value", description="The value of the parameter", examples=["true", "hi_res"])
+    value: str = Field(
+        title="Value", description="The value of the parameter", examples=["true", "hi_res"]
+    )
 
 
 class APIProcessingConfigModel(BaseModel):

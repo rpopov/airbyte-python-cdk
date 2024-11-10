@@ -107,7 +107,7 @@ exclude = ["__init__.py"]  # TODO: Remove after this is fixed: https://github.co
 # Setting python version to at least 3.10 avoids `from __future__ import annotations`.
 target-version = "py310"
 # This is consistent with airbytehq/airbyte root pyproject.toml Black rule defined.
-line-length = 140
+line-length = 100
 
 [tool.poe.tasks]
 # Build tasks

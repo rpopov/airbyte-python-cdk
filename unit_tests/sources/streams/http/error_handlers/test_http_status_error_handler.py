@@ -6,7 +6,11 @@ from unittest.mock import MagicMock
 import pytest
 import requests
 from airbyte_cdk.models import FailureType
-from airbyte_cdk.sources.streams.http.error_handlers import ErrorResolution, HttpStatusErrorHandler, ResponseAction
+from airbyte_cdk.sources.streams.http.error_handlers import (
+    ErrorResolution,
+    HttpStatusErrorHandler,
+    ResponseAction,
+)
 
 logger = MagicMock()
 
@@ -25,8 +29,18 @@ def test_given_ok_response_http_status_error_handler_returns_success_action(mock
 @pytest.mark.parametrize(
     "error, expected_action, expected_failure_type, expected_error_message",
     [
-        (403, ResponseAction.FAIL, FailureType.config_error, "Forbidden. You don't have permission to access this resource."),
-        (404, ResponseAction.FAIL, FailureType.system_error, "Not found. The requested resource was not found on the server."),
+        (
+            403,
+            ResponseAction.FAIL,
+            FailureType.config_error,
+            "Forbidden. You don't have permission to access this resource.",
+        ),
+        (
+            404,
+            ResponseAction.FAIL,
+            FailureType.system_error,
+            "Not found. The requested resource was not found on the server.",
+        ),
     ],
 )
 def test_given_error_code_in_response_http_status_error_handler_returns_expected_actions(
@@ -59,7 +73,9 @@ def test_given_unmapped_status_error_returns_retry_action_as_transient_error():
 
 
 def test_given_requests_exception_returns_retry_action_as_transient_error():
-    error_resolution = HttpStatusErrorHandler(logger).interpret_response(requests.RequestException())
+    error_resolution = HttpStatusErrorHandler(logger).interpret_response(
+        requests.RequestException()
+    )
 
     assert error_resolution.response_action == ResponseAction.RETRY
     assert error_resolution.failure_type
@@ -91,15 +107,22 @@ def test_given_injected_error_mapping_returns_expected_action():
 
     assert default_error_resolution.response_action == ResponseAction.RETRY
     assert default_error_resolution.failure_type == FailureType.system_error
-    assert default_error_resolution.error_message == f"Unexpected HTTP Status Code in error handler: {mock_response.status_code}"
+    assert (
+        default_error_resolution.error_message
+        == f"Unexpected HTTP Status Code in error handler: {mock_response.status_code}"
+    )
 
     mapped_error_resolution = ErrorResolution(
-        response_action=ResponseAction.IGNORE, failure_type=FailureType.transient_error, error_message="Injected mapping"
+        response_action=ResponseAction.IGNORE,
+        failure_type=FailureType.transient_error,
+        error_message="Injected mapping",
     )
 
     error_mapping = {509: mapped_error_resolution}
 
-    actual_error_resolution = HttpStatusErrorHandler(logger, error_mapping).interpret_response(mock_response)
+    actual_error_resolution = HttpStatusErrorHandler(logger, error_mapping).interpret_response(
+        mock_response
+    )
 
     assert actual_error_resolution.response_action == mapped_error_resolution.response_action
     assert actual_error_resolution.failure_type == mapped_error_resolution.failure_type

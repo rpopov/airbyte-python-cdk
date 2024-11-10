@@ -1071,7 +1071,9 @@ class ApiKeyAuthenticator(BaseModel):
 
 
 class AuthFlow(BaseModel):
-    auth_flow_type: Optional[AuthFlowType] = Field(None, description="The type of auth to use", title="Auth flow type")
+    auth_flow_type: Optional[AuthFlowType] = Field(
+        None, description="The type of auth to use", title="Auth flow type"
+    )
     predicate_key: Optional[List[str]] = Field(
         None,
         description="JSON path to a field in the connectorSpecification that should exist for the advanced auth to be applicable.",
@@ -1214,7 +1216,9 @@ class DefaultErrorHandler(BaseModel):
 
 class DefaultPaginator(BaseModel):
     type: Literal["DefaultPaginator"]
-    pagination_strategy: Union[CursorPagination, CustomPaginationStrategy, OffsetIncrement, PageIncrement] = Field(
+    pagination_strategy: Union[
+        CursorPagination, CustomPaginationStrategy, OffsetIncrement, PageIncrement
+    ] = Field(
         ...,
         description="Strategy defining how records are paginated.",
         title="Pagination Strategy",
@@ -1383,18 +1387,26 @@ class DeclarativeStream(BaseModel):
         title="Incremental Sync",
     )
     name: Optional[str] = Field("", description="The stream name.", example=["Users"], title="Name")
-    primary_key: Optional[PrimaryKey] = Field("", description="The primary key of the stream.", title="Primary Key")
-    schema_loader: Optional[Union[InlineSchemaLoader, JsonFileSchemaLoader, CustomSchemaLoader]] = Field(
-        None,
-        description="Component used to retrieve the schema for the current stream.",
-        title="Schema Loader",
+    primary_key: Optional[PrimaryKey] = Field(
+        "", description="The primary key of the stream.", title="Primary Key"
     )
-    transformations: Optional[List[Union[AddFields, CustomTransformation, RemoveFields, KeysToLower]]] = Field(
+    schema_loader: Optional[Union[InlineSchemaLoader, JsonFileSchemaLoader, CustomSchemaLoader]] = (
+        Field(
+            None,
+            description="Component used to retrieve the schema for the current stream.",
+            title="Schema Loader",
+        )
+    )
+    transformations: Optional[
+        List[Union[AddFields, CustomTransformation, RemoveFields, KeysToLower]]
+    ] = Field(
         None,
         description="A list of transformations to be applied to each output record.",
         title="Transformations",
     )
-    state_migrations: Optional[List[Union[LegacyToPerPartitionStateMigration, CustomStateMigration]]] = Field(
+    state_migrations: Optional[
+        List[Union[LegacyToPerPartitionStateMigration, CustomStateMigration]]
+    ] = Field(
         [],
         description="Array of state migrations to be applied on the input state",
         title="State Migrations",
@@ -1433,12 +1445,16 @@ class SessionTokenAuthenticator(BaseModel):
         examples=["PT1H", "P1D"],
         title="Expiration Duration",
     )
-    request_authentication: Union[SessionTokenRequestApiKeyAuthenticator, SessionTokenRequestBearerAuthenticator] = Field(
+    request_authentication: Union[
+        SessionTokenRequestApiKeyAuthenticator, SessionTokenRequestBearerAuthenticator
+    ] = Field(
         ...,
         description="Authentication method to use for requests sent to the API, specifying how to inject the session token.",
         title="Data Request Authentication",
     )
-    decoder: Optional[Union[JsonDecoder, XmlDecoder]] = Field(None, description="Component used to decode the response.", title="Decoder")
+    decoder: Optional[Union[JsonDecoder, XmlDecoder]] = Field(
+        None, description="Component used to decode the response.", title="Decoder"
+    )
     parameters: Optional[Dict[str, Any]] = Field(None, alias="$parameters")
 
 
@@ -1481,7 +1497,9 @@ class HttpRequester(BaseModel):
         description="Authentication method to use for requests sent to the API.",
         title="Authenticator",
     )
-    error_handler: Optional[Union[DefaultErrorHandler, CustomErrorHandler, CompositeErrorHandler]] = Field(
+    error_handler: Optional[
+        Union[DefaultErrorHandler, CustomErrorHandler, CompositeErrorHandler]
+    ] = Field(
         None,
         description="Error handler component that defines how to handle errors.",
         title="Error Handler",
@@ -1545,7 +1563,9 @@ class ParentStreamConfig(BaseModel):
         examples=["id", "{{ config['parent_record_id'] }}"],
         title="Parent Key",
     )
-    stream: DeclarativeStream = Field(..., description="Reference to the parent stream.", title="Parent Stream")
+    stream: DeclarativeStream = Field(
+        ..., description="Reference to the parent stream.", title="Parent Stream"
+    )
     partition_field: str = Field(
         ...,
         description="While iterating over parent records during a sync, the parent_key value can be referenced by using this field.",
@@ -1614,7 +1634,9 @@ class AsyncRetriever(BaseModel):
         ...,
         description="Component that describes how to extract records from a HTTP response.",
     )
-    status_mapping: AsyncJobStatusMap = Field(..., description="Async Job Status to Airbyte CDK Async Job Status mapping.")
+    status_mapping: AsyncJobStatusMap = Field(
+        ..., description="Async Job Status to Airbyte CDK Async Job Status mapping."
+    )
     status_extractor: Union[CustomRecordExtractor, DpathExtractor] = Field(
         ..., description="Responsible for fetching the actual status of the async job."
     )

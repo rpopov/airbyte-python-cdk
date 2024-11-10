@@ -92,7 +92,9 @@ class BaseOpenAIEmbedder(Embedder):
         batches = create_chunks(documents, batch_size=embedding_batch_size)
         embeddings: List[Optional[List[float]]] = []
         for batch in batches:
-            embeddings.extend(self.embeddings.embed_documents([chunk.page_content for chunk in batch]))
+            embeddings.extend(
+                self.embeddings.embed_documents([chunk.page_content for chunk in batch])
+            )
         return embeddings
 
     @property
@@ -103,7 +105,12 @@ class BaseOpenAIEmbedder(Embedder):
 
 class OpenAIEmbedder(BaseOpenAIEmbedder):
     def __init__(self, config: OpenAIEmbeddingConfigModel, chunk_size: int):
-        super().__init__(OpenAIEmbeddings(openai_api_key=config.openai_key, max_retries=15, disallowed_special=()), chunk_size)  # type: ignore
+        super().__init__(
+            OpenAIEmbeddings(
+                openai_api_key=config.openai_key, max_retries=15, disallowed_special=()
+            ),
+            chunk_size,
+        )  # type: ignore
 
 
 class AzureOpenAIEmbedder(BaseOpenAIEmbedder):
@@ -131,7 +138,9 @@ class CohereEmbedder(Embedder):
     def __init__(self, config: CohereEmbeddingConfigModel):
         super().__init__()
         # Client is set internally
-        self.embeddings = CohereEmbeddings(cohere_api_key=config.cohere_key, model="embed-english-light-v2.0")  # type: ignore
+        self.embeddings = CohereEmbeddings(
+            cohere_api_key=config.cohere_key, model="embed-english-light-v2.0"
+        )  # type: ignore
 
     def check(self) -> Optional[str]:
         try:
@@ -141,7 +150,10 @@ class CohereEmbedder(Embedder):
         return None
 
     def embed_documents(self, documents: List[Document]) -> List[Optional[List[float]]]:
-        return cast(List[Optional[List[float]]], self.embeddings.embed_documents([document.page_content for document in documents]))
+        return cast(
+            List[Optional[List[float]]],
+            self.embeddings.embed_documents([document.page_content for document in documents]),
+        )
 
     @property
     def embedding_dimensions(self) -> int:
@@ -162,7 +174,10 @@ class FakeEmbedder(Embedder):
         return None
 
     def embed_documents(self, documents: List[Document]) -> List[Optional[List[float]]]:
-        return cast(List[Optional[List[float]]], self.embeddings.embed_documents([document.page_content for document in documents]))
+        return cast(
+            List[Optional[List[float]]],
+            self.embeddings.embed_documents([document.page_content for document in documents]),
+        )
 
     @property
     def embedding_dimensions(self) -> int:
@@ -189,7 +204,10 @@ class OpenAICompatibleEmbedder(Embedder):
 
     def check(self) -> Optional[str]:
         deployment_mode = os.environ.get("DEPLOYMENT_MODE", "")
-        if deployment_mode.casefold() == CLOUD_DEPLOYMENT_MODE and not self.config.base_url.startswith("https://"):
+        if (
+            deployment_mode.casefold() == CLOUD_DEPLOYMENT_MODE
+            and not self.config.base_url.startswith("https://")
+        ):
             return "Base URL must start with https://"
 
         try:
@@ -199,7 +217,10 @@ class OpenAICompatibleEmbedder(Embedder):
         return None
 
     def embed_documents(self, documents: List[Document]) -> List[Optional[List[float]]]:
-        return cast(List[Optional[List[float]]], self.embeddings.embed_documents([document.page_content for document in documents]))
+        return cast(
+            List[Optional[List[float]]],
+            self.embeddings.embed_documents([document.page_content for document in documents]),
+        )
 
     @property
     def embedding_dimensions(self) -> int:
@@ -273,6 +294,9 @@ def create_from_config(
     processing_config: ProcessingConfigModel,
 ) -> Embedder:
     if embedding_config.mode == "azure_openai" or embedding_config.mode == "openai":
-        return cast(Embedder, embedder_map[embedding_config.mode](embedding_config, processing_config.chunk_size))
+        return cast(
+            Embedder,
+            embedder_map[embedding_config.mode](embedding_config, processing_config.chunk_size),
+        )
     else:
         return cast(Embedder, embedder_map[embedding_config.mode](embedding_config))
