@@ -151,7 +151,7 @@ class ExcelParser(FileTypeParser):
         if current_type == "string":
             # Previous column values were of the string type, no need to look further.
             return current_type
-        if dtype == object:
+        if dtype is object:
             return "string"
         if dtype in number_types and (not current_type or current_type == "number"):
             return "number"

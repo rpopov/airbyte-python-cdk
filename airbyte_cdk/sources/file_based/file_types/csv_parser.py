@@ -362,7 +362,7 @@ class CsvParser(FileTypeParser):
                     else:
                         warnings.append(_format_warning(key, value, prop_type))
 
-                elif python_type == bool:
+                elif python_type is bool:
                     try:
                         cast_value = _value_to_bool(
                             value, config_format.true_values, config_format.false_values
@@ -370,14 +370,14 @@ class CsvParser(FileTypeParser):
                     except ValueError:
                         warnings.append(_format_warning(key, value, prop_type))
 
-                elif python_type == dict:
+                elif python_type is dict:
                     try:
                         # we don't re-use _value_to_object here because we type the column as object as long as there is only one object
                         cast_value = orjson.loads(value)
                     except orjson.JSONDecodeError:
                         warnings.append(_format_warning(key, value, prop_type))
 
-                elif python_type == list:
+                elif python_type is list:
                     try:
                         cast_value = _value_to_list(value)
                     except (ValueError, json.JSONDecodeError):
