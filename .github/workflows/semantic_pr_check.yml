@@ -51,4 +51,4 @@ jobs:
           subjectPatternError: |
             The subject "{subject}" found in the pull request title "{title}"
             didn't match the configured pattern. Please check the title against
-            the naming rules.
+            the naming rules. You can also use the [WIP] prefix to bypass this check.
