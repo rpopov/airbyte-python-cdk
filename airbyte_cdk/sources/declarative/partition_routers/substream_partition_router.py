@@ -141,7 +141,10 @@ class SubstreamPartitionRouter(PartitionRouter):
                 partition_field = parent_stream_config.partition_field.eval(self.config)  # type: ignore # partition_field is always casted to an interpolated string
                 extra_fields = None
                 if parent_stream_config.extra_fields:
-                    extra_fields = [[field_path_part.eval(self.config) for field_path_part in field_path] for field_path in parent_stream_config.extra_fields]  # type: ignore # extra_fields is always casted to an interpolated string
+                    extra_fields = [
+                        [field_path_part.eval(self.config) for field_path_part in field_path]
+                        for field_path in parent_stream_config.extra_fields
+                    ]  # type: ignore # extra_fields is always casted to an interpolated string
 
                 # read_stateless() assumes the parent is not concurrent. This is currently okay since the concurrent CDK does
                 # not support either substreams or RFR, but something that needs to be considered once we do

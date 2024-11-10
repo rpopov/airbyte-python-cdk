@@ -19,10 +19,7 @@ from airbyte_cdk.sources.declarative.concurrency_level import ConcurrencyLevel
 def test_stream_slices(default_concurrency: Union[int, str], max_concurrency: int, expected_concurrency: int) -> None:
     config = {"num_workers": 50}
     concurrency_level = ConcurrencyLevel(
-        default_concurrency=default_concurrency,
-        max_concurrency=max_concurrency,
-        config=config,
-        parameters={}
+        default_concurrency=default_concurrency, max_concurrency=max_concurrency, config=config, parameters={}
     )
 
     actual_concurrency = concurrency_level.get_concurrency_level()
@@ -39,15 +36,12 @@ def test_stream_slices(default_concurrency: Union[int, str], max_concurrency: in
     ],
 )
 def test_default_concurrency_input_types_and_errors(
-        config: Mapping[str, Any],
-        expected_concurrency: Optional[int],
-        expected_error: Optional[Type[Exception]],
+    config: Mapping[str, Any],
+    expected_concurrency: Optional[int],
+    expected_error: Optional[Type[Exception]],
 ) -> None:
     concurrency_level = ConcurrencyLevel(
-        default_concurrency="{{ config['num_workers'] or 30 }}",
-        max_concurrency=65,
-        config=config,
-        parameters={}
+        default_concurrency="{{ config['num_workers'] or 30 }}", max_concurrency=65, config=config, parameters={}
     )
 
     if expected_error:
@@ -63,9 +57,4 @@ def test_max_concurrency_is_required_for_default_concurrency_using_config() -> N
     config = {"num_workers": "50"}
 
     with pytest.raises(ValueError):
-        ConcurrencyLevel(
-            default_concurrency="{{ config['num_workers'] or 40 }}",
-            max_concurrency=None,
-            config=config,
-            parameters={}
-        )
+        ConcurrencyLevel(default_concurrency="{{ config['num_workers'] or 40 }}", max_concurrency=None, config=config, parameters={})

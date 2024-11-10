@@ -22,7 +22,6 @@ class CustomBackoffStrategy(BackoffStrategy):
 
 
 def test_given_valid_arguments_default_backoff_strategy_returns_values():
-
     response = requests.Response()
     response.headers["Retry-After"] = 123
     backoff_strategy = CustomBackoffStrategy()

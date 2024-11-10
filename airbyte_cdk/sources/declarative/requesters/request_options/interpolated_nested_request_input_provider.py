@@ -23,7 +23,6 @@ class InterpolatedNestedRequestInputProvider:
     _request_inputs: Optional[Union[str, NestedMapping]] = field(init=False, repr=False, default=None)
 
     def __post_init__(self, parameters: Mapping[str, Any]) -> None:
-
         self._request_inputs = self.request_inputs or {}
         if isinstance(self._request_inputs, str):
             self._interpolator = InterpolatedString(self._request_inputs, default="", parameters=parameters)

@@ -28,7 +28,6 @@ _NO_LIMIT = 10000
 
 
 class MockAsyncJobRepository(AsyncJobRepository):
-
     def start(self, stream_slice: StreamSlice) -> AsyncJob:
         return AsyncJob("a_job_id", StreamSlice(partition={}, cursor_slice={}))
 
@@ -47,7 +46,6 @@ class MockAsyncJobRepository(AsyncJobRepository):
 
 
 class MockSource(AbstractSource):
-
     def __init__(self, stream_slicer: Optional[StreamSlicer] = None) -> None:
         self._stream_slicer = SinglePartitionRouter({}) if stream_slicer is None else stream_slicer
         self._message_repository = NoopMessageRepository()
@@ -65,7 +63,7 @@ class MockSource(AbstractSource):
             parameters={},
             schema_normalization=TypeTransformer(TransformConfig.NoTransform),
             record_filter=None,
-            transformations=[]
+            transformations=[],
         )
         return [
             DeclarativeStream(
@@ -75,7 +73,10 @@ class MockSource(AbstractSource):
                     record_selector=noop_record_selector,
                     stream_slicer=self._stream_slicer,
                     job_orchestrator_factory=lambda stream_slices: AsyncJobOrchestrator(
-                        MockAsyncJobRepository(), stream_slices, JobTracker(_NO_LIMIT), self._message_repository,
+                        MockAsyncJobRepository(),
+                        stream_slices,
+                        JobTracker(_NO_LIMIT),
+                        self._message_repository,
                     ),
                 ),
                 config={},
@@ -100,9 +101,7 @@ class JobDeclarativeStreamTest(TestCase):
 
     def test_when_read_then_return_records_from_repository(self) -> None:
         output = read(
-            self._source,
-            self._CONFIG,
-            CatalogBuilder().with_stream(ConfiguredAirbyteStreamBuilder().with_name(_A_STREAM_NAME)).build()
+            self._source, self._CONFIG, CatalogBuilder().with_stream(ConfiguredAirbyteStreamBuilder().with_name(_A_STREAM_NAME)).build()
         )
 
         assert len(output.records) == 1
@@ -112,9 +111,7 @@ class JobDeclarativeStreamTest(TestCase):
         As generating stream slices is very expensive, we want to ensure that during a read, it is only called once.
         """
         output = read(
-            self._source,
-            self._CONFIG,
-            CatalogBuilder().with_stream(ConfiguredAirbyteStreamBuilder().with_name(_A_STREAM_NAME)).build()
+            self._source, self._CONFIG, CatalogBuilder().with_stream(ConfiguredAirbyteStreamBuilder().with_name(_A_STREAM_NAME)).build()
         )
 
         assert not output.errors

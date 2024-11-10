@@ -63,8 +63,18 @@ class StreamFacadeSource(ConcurrentSourceAdapter):
         state_converter = StreamFacadeConcurrentConnectorStateConverter()
 
         return [
-            self.convert_to_concurrent_stream(stream.logger, stream, state_manager, self.initialize_cursor(
-                stream, state_manager, state_converter, self._cursor_boundaries, None, EpochValueConcurrentStreamStateConverter.get_end_provider())
+            self.convert_to_concurrent_stream(
+                stream.logger,
+                stream,
+                state_manager,
+                self.initialize_cursor(
+                    stream,
+                    state_manager,
+                    state_converter,
+                    self._cursor_boundaries,
+                    None,
+                    EpochValueConcurrentStreamStateConverter.get_end_provider(),
+                ),
             )
             for stream in self._streams
         ]

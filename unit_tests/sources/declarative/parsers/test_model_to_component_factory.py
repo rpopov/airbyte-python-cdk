@@ -2226,7 +2226,6 @@ class MyCustomSchemaLoader(SchemaLoader):
 
 
 def test_create_custom_schema_loader():
-
     definition = {
         "type": "CustomSchemaLoader",
         "class_name": "unit_tests.sources.declarative.parsers.test_model_to_component_factory.MyCustomSchemaLoader",
@@ -2561,14 +2560,13 @@ def test_use_default_request_options_provider():
     "stream_state,expected_start",
     [
         pytest.param({}, "2024-08-01T00:00:00.000000Z", id="test_create_concurrent_cursor_without_state"),
-        pytest.param({"updated_at": "2024-10-01T00:00:00.000000Z"}, "2024-10-01T00:00:00.000000Z", id="test_create_concurrent_cursor_with_state"),
-    ]
+        pytest.param(
+            {"updated_at": "2024-10-01T00:00:00.000000Z"}, "2024-10-01T00:00:00.000000Z", id="test_create_concurrent_cursor_with_state"
+        ),
+    ],
 )
 def test_create_concurrent_cursor_from_datetime_based_cursor_all_fields(stream_state, expected_start):
-    config = {
-        "start_time": "2024-08-01T00:00:00.000000Z",
-        "end_time": "2024-10-15T00:00:00.000000Z"
-    }
+    config = {"start_time": "2024-08-01T00:00:00.000000Z", "end_time": "2024-10-15T00:00:00.000000Z"}
 
     expected_cursor_field = "updated_at"
     expected_start_boundary = "custom_start"
@@ -2621,7 +2619,7 @@ def test_create_concurrent_cursor_from_datetime_based_cursor_all_fields(stream_s
         "partition_field_end": "custom_end",
         "step": "P10D",
         "cursor_granularity": "PT0.000001S",
-        "lookback_window": "P3D"
+        "lookback_window": "P3D",
     }
 
     concurrent_cursor, stream_state_converter = connector_builder_factory.create_concurrent_cursor_from_datetime_based_cursor(
@@ -2657,27 +2655,34 @@ def test_create_concurrent_cursor_from_datetime_based_cursor_all_fields(stream_s
 @pytest.mark.parametrize(
     "cursor_fields_to_replace,assertion_field,expected_value,expected_error",
     [
-        pytest.param({"partition_field_start": None}, "slice_boundary_fields", ('start_time', 'custom_end'), None, id="test_no_partition_field_start"),
-        pytest.param({"partition_field_end": None}, "slice_boundary_fields", ('custom_start', 'end_time'), None, id="test_no_partition_field_end"),
+        pytest.param(
+            {"partition_field_start": None}, "slice_boundary_fields", ("start_time", "custom_end"), None, id="test_no_partition_field_start"
+        ),
+        pytest.param(
+            {"partition_field_end": None}, "slice_boundary_fields", ("custom_start", "end_time"), None, id="test_no_partition_field_end"
+        ),
         pytest.param({"lookback_window": None}, "_lookback_window", None, None, id="test_no_lookback_window"),
         pytest.param({"lookback_window": "{{ config.does_not_exist }}"}, "_lookback_window", None, None, id="test_no_lookback_window"),
         pytest.param({"step": None}, None, None, ValueError, id="test_no_step_raises_exception"),
         pytest.param({"cursor_granularity": None}, None, None, ValueError, id="test_no_cursor_granularity_exception"),
-        pytest.param({
-            "end_time": None,
-            "cursor_granularity": None,
-            "step": None,
-        }, "_slice_range", datetime.timedelta.max, None, id="test_uses_a_single_time_interval_when_no_specified_step_and_granularity"),
-    ]
+        pytest.param(
+            {
+                "end_time": None,
+                "cursor_granularity": None,
+                "step": None,
+            },
+            "_slice_range",
+            datetime.timedelta.max,
+            None,
+            id="test_uses_a_single_time_interval_when_no_specified_step_and_granularity",
+        ),
+    ],
 )
 @freezegun.freeze_time("2024-10-01T00:00:00")
 def test_create_concurrent_cursor_from_datetime_based_cursor(cursor_fields_to_replace, assertion_field, expected_value, expected_error):
     connector_state_manager = ConnectorStateManager()
 
-    config = {
-        "start_time": "2024-08-01T00:00:00.000000Z",
-        "end_time": "2024-09-01T00:00:00.000000Z"
-    }
+    config = {"start_time": "2024-08-01T00:00:00.000000Z", "end_time": "2024-09-01T00:00:00.000000Z"}
 
     stream_name = "test"
 
@@ -2738,10 +2743,7 @@ def test_create_concurrent_cursor_uses_min_max_datetime_format_if_defined():
 
     connector_state_manager = ConnectorStateManager()
 
-    config = {
-        "start_time": "2024-08-01T00:00:00Z",
-        "end_time": "2024-09-01T00:00:00Z"
-    }
+    config = {"start_time": "2024-08-01T00:00:00Z", "end_time": "2024-09-01T00:00:00Z"}
 
     connector_builder_factory = ModelToComponentFactory(emit_connector_builder_messages=True)
 
@@ -2751,21 +2753,13 @@ def test_create_concurrent_cursor_uses_min_max_datetime_format_if_defined():
         "type": "DatetimeBasedCursor",
         "cursor_field": "updated_at",
         "datetime_format": "%Y-%m-%dT%H:%MZ",
-        "start_datetime": {
-            "type": "MinMaxDatetime",
-            "datetime": "{{ config.start_time }}",
-            "datetime_format": "%Y-%m-%dT%H:%M:%SZ"
-        },
-        "end_datetime": {
-            "type": "MinMaxDatetime",
-            "datetime": "{{ config.end_time }}",
-            "datetime_format": "%Y-%m-%dT%H:%M:%SZ"
-        },
+        "start_datetime": {"type": "MinMaxDatetime", "datetime": "{{ config.start_time }}", "datetime_format": "%Y-%m-%dT%H:%M:%SZ"},
+        "end_datetime": {"type": "MinMaxDatetime", "datetime": "{{ config.end_time }}", "datetime_format": "%Y-%m-%dT%H:%M:%SZ"},
         "partition_field_start": "custom_start",
         "partition_field_end": "custom_end",
         "step": "P10D",
         "cursor_granularity": "PT0.000001S",
-        "lookback_window": "P3D"
+        "lookback_window": "P3D",
     }
 
     concurrent_cursor, stream_state_converter = connector_builder_factory.create_concurrent_cursor_from_datetime_based_cursor(

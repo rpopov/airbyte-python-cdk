@@ -74,7 +74,9 @@ def handle_request(args: List[str]) -> str:
     command, config, catalog, state = get_config_and_catalog_from_args(args)
     limits = get_limits(config)
     source = create_source(config, limits)
-    return orjson.dumps(AirbyteMessageSerializer.dump(handle_connector_builder_request(source, command, config, catalog, state, limits))).decode()  # type: ignore[no-any-return] # Serializer.dump() always returns AirbyteMessage
+    return orjson.dumps(
+        AirbyteMessageSerializer.dump(handle_connector_builder_request(source, command, config, catalog, state, limits))
+    ).decode()  # type: ignore[no-any-return] # Serializer.dump() always returns AirbyteMessage
 
 
 if __name__ == "__main__":

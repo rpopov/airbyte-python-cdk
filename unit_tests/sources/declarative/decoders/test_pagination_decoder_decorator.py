@@ -11,16 +11,10 @@ class StreamingJsonDecoder(JsonDecoder):
         return True
 
 
-@pytest.mark.parametrize(
-        "decoder_class, expected",
-        [
-            (StreamingJsonDecoder, {}),
-            (JsonDecoder, {"data": [{"id": 1}, {"id": 2}]})
-        ]
-)
+@pytest.mark.parametrize("decoder_class, expected", [(StreamingJsonDecoder, {}), (JsonDecoder, {"data": [{"id": 1}, {"id": 2}]})])
 def test_pagination_decoder_decorator(requests_mock, decoder_class, expected):
     decoder = PaginationDecoderDecorator(decoder=decoder_class(parameters={}))
-    response_body = "{\"data\": [{\"id\": 1}, {\"id\": 2}]}"
+    response_body = '{"data": [{"id": 1}, {"id": 2}]}'
     requests_mock.register_uri("GET", "https://airbyte.io/", text=response_body)
     response = requests.get("https://airbyte.io/")
     assert next(decoder.decode(response)) == expected

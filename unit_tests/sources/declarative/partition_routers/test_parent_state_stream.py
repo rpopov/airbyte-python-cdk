@@ -646,11 +646,7 @@ def test_incremental_parent_state(test_name, manifest, mock_requests, expected_r
                     type=AirbyteStateType.STREAM,
                     stream=AirbyteStreamState(
                         stream_descriptor=StreamDescriptor(name="post_comment_votes", namespace=None),
-                        stream_state=AirbyteStateBlob(
-                            {
-                                "created_at": "2024-01-02T00:00:00Z"
-                            }
-                        ),
+                        stream_state=AirbyteStateBlob({"created_at": "2024-01-02T00:00:00Z"}),
                     ),
                 )
             ],
@@ -682,8 +678,8 @@ def test_incremental_parent_state(test_name, manifest, mock_requests, expected_r
                         "cursor": {"created_at": "2024-01-13T00:00:00Z"},
                     },
                     {
-                        'partition': {'id': 12, 'parent_slice': {'id': 1, 'parent_slice': {}}},
-                        'cursor': {'created_at': '2024-01-02T00:00:00Z'},
+                        "partition": {"id": 12, "parent_slice": {"id": 1, "parent_slice": {}}},
+                        "cursor": {"created_at": "2024-01-02T00:00:00Z"},
                     },
                     {
                         "partition": {"id": 20, "parent_slice": {"id": 2, "parent_slice": {}}},

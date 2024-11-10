@@ -42,7 +42,6 @@ class HttpResponseFilter:
     error_message: Union[InterpolatedString, str] = ""
 
     def __post_init__(self, parameters: Mapping[str, Any]) -> None:
-
         if self.action is not None:
             if self.http_codes is None and self.predicate is None and self.error_message_contains is None:
                 raise ValueError("HttpResponseFilter requires a filter condition if an action is specified")
@@ -129,7 +128,14 @@ class HttpResponseFilter:
         return self.error_message.eval(self.config, response=self._safe_response_json(response), headers=response.headers)  # type: ignore # error_message is always cast to an interpolated string
 
     def _response_matches_predicate(self, response: requests.Response) -> bool:
-        return bool(self.predicate.condition and self.predicate.eval(None, response=self._safe_response_json(response), headers=response.headers)) if self.predicate else False  # type: ignore # predicate is always cast to an interpolated string
+        return (
+            bool(
+                self.predicate.condition
+                and self.predicate.eval(None, response=self._safe_response_json(response), headers=response.headers)
+            )
+            if self.predicate
+            else False
+        )  # type: ignore # predicate is always cast to an interpolated string
 
     def _response_contains_error_message(self, response: requests.Response) -> bool:
         if not self.error_message_contains:

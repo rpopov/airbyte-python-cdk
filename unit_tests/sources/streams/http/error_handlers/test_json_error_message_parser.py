@@ -22,7 +22,8 @@ from airbyte_cdk.sources.streams.http.error_handlers import JsonErrorMessagePars
         (b'{"error_message": "error_message error message"}', "error_message error message"),
         (b'{"msg": "msg error message"}', "msg error message"),
         (b'{"reason": "reason error message"}', "reason error message"),
-        (b'{"status_message": "status_message error message"}', "status_message error message"),],
+        (b'{"status_message": "status_message error message"}', "status_message error message"),
+    ],
 )
 def test_given_error_message_in_response_body_parse_response_error_message_returns_error_message(response_body, expected_error_message):
     response = requests.Response()

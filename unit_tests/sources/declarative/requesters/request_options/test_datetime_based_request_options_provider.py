@@ -86,12 +86,7 @@ from airbyte_cdk.sources.declarative.types import StreamSlice
     ],
 )
 def test_datetime_based_request_options_provider(
-        start_time_option,
-        end_time_option,
-        partition_field_start,
-        partition_field_end,
-        stream_slice,
-        expected_request_options
+    start_time_option, end_time_option, partition_field_start, partition_field_end, stream_slice, expected_request_options
 ):
     config = {}
     request_options_provider = DatetimeBasedRequestOptionsProvider(
@@ -100,7 +95,7 @@ def test_datetime_based_request_options_provider(
         partition_field_start=partition_field_start,
         partition_field_end=partition_field_end,
         config=config,
-        parameters={}
+        parameters={},
     )
 
     request_option_type = start_time_option.inject_into if isinstance(start_time_option, RequestOption) else None

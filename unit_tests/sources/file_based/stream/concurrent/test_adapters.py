@@ -70,12 +70,18 @@ def test_file_based_stream_partition_generator(sync_mode):
     [
         pytest.param(
             TypeTransformer(TransformConfig.NoTransform),
-            [Record({"data": "1"}, Mock(spec=FileBasedStreamPartition, stream_name=Mock(return_value=_STREAM_NAME))), Record({"data": "2"}, Mock(spec=FileBasedStreamPartition, stream_name=Mock(return_value=_STREAM_NAME)))],
+            [
+                Record({"data": "1"}, Mock(spec=FileBasedStreamPartition, stream_name=Mock(return_value=_STREAM_NAME))),
+                Record({"data": "2"}, Mock(spec=FileBasedStreamPartition, stream_name=Mock(return_value=_STREAM_NAME))),
+            ],
             id="test_no_transform",
         ),
         pytest.param(
             TypeTransformer(TransformConfig.DefaultSchemaNormalization),
-            [Record({"data": 1}, Mock(spec=FileBasedStreamPartition, stream_name=Mock(return_value=_STREAM_NAME))), Record({"data": 2}, Mock(spec=FileBasedStreamPartition, stream_name=Mock(return_value=_STREAM_NAME)))],
+            [
+                Record({"data": 1}, Mock(spec=FileBasedStreamPartition, stream_name=Mock(return_value=_STREAM_NAME))),
+                Record({"data": 2}, Mock(spec=FileBasedStreamPartition, stream_name=Mock(return_value=_STREAM_NAME))),
+            ],
             id="test_default_transform",
         ),
     ],

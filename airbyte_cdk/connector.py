@@ -96,8 +96,7 @@ class BaseConnector(ABC, Generic[TConfig]):
 
 class _WriteConfigProtocol(Protocol):
     @staticmethod
-    def write_config(config: Mapping[str, Any], config_path: str) -> None:
-        ...
+    def write_config(config: Mapping[str, Any], config_path: str) -> None: ...
 
 
 class DefaultConnectorMixin:
@@ -108,5 +107,4 @@ class DefaultConnectorMixin:
         return config
 
 
-class Connector(DefaultConnectorMixin, BaseConnector[Mapping[str, Any]], ABC):
-    ...
+class Connector(DefaultConnectorMixin, BaseConnector[Mapping[str, Any]], ABC): ...

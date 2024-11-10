@@ -12,11 +12,9 @@ from airbyte_cdk.sources.streams.http.error_handlers.response_models import Erro
 
 class DefaultHttpResponseFilter(HttpResponseFilter):
     def matches(self, response_or_exception: Optional[Union[requests.Response, Exception]]) -> Optional[ErrorResolution]:
-
         default_mapped_error_resolution = None
 
         if isinstance(response_or_exception, (requests.Response, Exception)):
-
             mapped_key: Union[int, type] = (
                 response_or_exception.status_code
                 if isinstance(response_or_exception, requests.Response)

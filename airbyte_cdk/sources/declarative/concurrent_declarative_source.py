@@ -31,7 +31,6 @@ from airbyte_cdk.sources.streams.concurrent.helpers import get_primary_key_from_
 
 
 class ConcurrentDeclarativeSource(ManifestDeclarativeSource, Generic[TState]):
-
     # By default, we defer to a value of 1 which represents running a connector using the Concurrent CDK engine on only one thread.
     SINGLE_THREADED_CONCURRENCY_LEVEL = 1
 
@@ -99,7 +98,6 @@ class ConcurrentDeclarativeSource(ManifestDeclarativeSource, Generic[TState]):
         catalog: ConfiguredAirbyteCatalog,
         state: Optional[Union[List[AirbyteStateMessage]]] = None,
     ) -> Iterator[AirbyteMessage]:
-
         # ConcurrentReadProcessor pops streams that are finished being read so before syncing, the names of the concurrent
         # streams must be saved so that they can be removed from the catalog before starting synchronous streams
         if self._concurrent_streams:

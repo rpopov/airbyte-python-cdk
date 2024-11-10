@@ -1,4 +1,4 @@
-name: On-Demand PR Test
+name: On-Demand Test
 
 on:
   workflow_dispatch:

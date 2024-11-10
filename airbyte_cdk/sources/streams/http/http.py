@@ -448,7 +448,6 @@ class HttpStream(Stream, CheckpointMixin, ABC):
         stream_state: Optional[Mapping[str, Any]] = None,
         next_page_token: Optional[Mapping[str, Any]] = None,
     ) -> Tuple[requests.PreparedRequest, requests.Response]:
-
         request, response = self._http_client.send_request(
             http_method=self.http_method,
             url=self._join_url(

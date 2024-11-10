@@ -1,4 +1,4 @@
-name: On-Demand PR Auto-Fix
+name: On-Demand AutoFix
 
 on:
   workflow_dispatch:

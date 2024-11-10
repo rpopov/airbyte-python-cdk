@@ -159,7 +159,7 @@ def test_default_paginator_with_cursor(
     expected_next_page_token,
     limit,
     decoder,
-    response_body
+    response_body,
 ):
     page_size_request_option = RequestOption(
         inject_into=RequestOptionType.request_parameter, field_name="{{parameters['page_limit']}}", parameters={"page_limit": "limit"}
@@ -352,11 +352,13 @@ def test_paginator_with_page_option_no_page_size():
     pagination_strategy = OffsetIncrement(config={}, page_size=None, parameters={})
 
     with pytest.raises(ValueError):
-        DefaultPaginator(
-            page_size_option=MagicMock(),
-            page_token_option=RequestOption("limit", RequestOptionType.request_parameter, parameters={}),
-            pagination_strategy=pagination_strategy,
-            config=MagicMock(),
-            url_base=MagicMock(),
-            parameters={},
-        ),
+        (
+            DefaultPaginator(
+                page_size_option=MagicMock(),
+                page_token_option=RequestOption("limit", RequestOptionType.request_parameter, parameters={}),
+                pagination_strategy=pagination_strategy,
+                config=MagicMock(),
+                url_base=MagicMock(),
+                parameters={},
+            ),
+        )

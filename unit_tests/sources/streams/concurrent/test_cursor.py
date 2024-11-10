@@ -407,7 +407,10 @@ class ConcurrentCursorStateTest(TestCase):
         slices = list(cursor.generate_slices())
 
         assert slices == [
-            (datetime.fromtimestamp(31, timezone.utc), datetime.fromtimestamp(40, timezone.utc)),  # FIXME there should probably be the granularity at the beginning too
+            (
+                datetime.fromtimestamp(31, timezone.utc),
+                datetime.fromtimestamp(40, timezone.utc),
+            ),  # FIXME there should probably be the granularity at the beginning too
         ]
 
     @freezegun.freeze_time(time_to_freeze=datetime.fromtimestamp(50, timezone.utc))
@@ -512,9 +515,7 @@ class ConcurrentCursorStateTest(TestCase):
         cursor.close_partition(second_partition)
 
         assert self._state_manager.update_state_for_stream.call_args_list[-1].args[2] == {
-            "slices": [
-                {"end": 20, "start": 0, "most_recent_cursor_value": 15}
-            ],
+            "slices": [{"end": 20, "start": 0, "most_recent_cursor_value": 15}],
             "state_type": "date-range",
         }
 
@@ -528,9 +529,7 @@ class ConcurrentCursorStateTest(TestCase):
         cursor.close_partition(second_partition)
 
         assert self._state_manager.update_state_for_stream.call_args_list[-1].args[2] == {
-            "slices": [
-                {"end": 20, "start": 0, "most_recent_cursor_value": 5}
-            ],
+            "slices": [{"end": 20, "start": 0, "most_recent_cursor_value": 5}],
             "state_type": "date-range",
         }
 
@@ -544,9 +543,7 @@ class ConcurrentCursorStateTest(TestCase):
         cursor.close_partition(partition)
 
         assert self._state_manager.update_state_for_stream.call_args_list[-1].args[2] == {
-            "slices": [
-                {"end": 10, "start": 0, "most_recent_cursor_value": 15}
-            ],
+            "slices": [{"end": 10, "start": 0, "most_recent_cursor_value": 15}],
             "state_type": "date-range",
         }
 
@@ -556,11 +553,11 @@ class ConcurrentCursorStateTest(TestCase):
         cursor.observe(_record(7, partition=partition))
         cursor.close_partition(partition)
 
-        assert self._state_manager.update_state_for_stream.call_args_list[-1].args[2] == {
-            _A_CURSOR_FIELD_KEY: 7
-        }
+        assert self._state_manager.update_state_for_stream.call_args_list[-1].args[2] == {_A_CURSOR_FIELD_KEY: 7}
 
-    def test_non_continuous_slices_on_sequential_state_when_close_then_cursor_value_is_most_recent_cursor_value_of_first_slice(self) -> None:
+    def test_non_continuous_slices_on_sequential_state_when_close_then_cursor_value_is_most_recent_cursor_value_of_first_slice(
+        self,
+    ) -> None:
         cursor = self._cursor_with_slice_boundary_fields(is_sequential_state=True)
         first_partition = _partition({_LOWER_SLICE_BOUNDARY_FIELD: 0, _UPPER_SLICE_BOUNDARY_FIELD: 10})
         third_partition = _partition({_LOWER_SLICE_BOUNDARY_FIELD: 20, _UPPER_SLICE_BOUNDARY_FIELD: 30})  # second partition has failed
@@ -569,9 +566,7 @@ class ConcurrentCursorStateTest(TestCase):
 
         cursor.close_partition(third_partition)
 
-        assert self._state_manager.update_state_for_stream.call_args_list[-1].args[2] == {
-            _A_CURSOR_FIELD_KEY: 7
-        }
+        assert self._state_manager.update_state_for_stream.call_args_list[-1].args[2] == {_A_CURSOR_FIELD_KEY: 7}
 
     @freezegun.freeze_time(time_to_freeze=datetime.fromtimestamp(10, timezone.utc))
     def test_given_overflowing_slice_gap_when_generate_slices_then_cap_upper_bound_to_end_provider(self) -> None:
@@ -613,7 +608,7 @@ class ConcurrentCursorStateTest(TestCase):
                 (datetime(2024, 1, 21, 0, 0, tzinfo=timezone.utc), datetime(2024, 1, 30, 23, 59, 59, tzinfo=timezone.utc)),
                 (datetime(2024, 1, 31, 0, 0, tzinfo=timezone.utc), datetime(2024, 2, 9, 23, 59, 59, tzinfo=timezone.utc)),
                 (datetime(2024, 2, 10, 0, 0, tzinfo=timezone.utc), datetime(2024, 2, 19, 23, 59, 59, tzinfo=timezone.utc)),
-                (datetime(2024, 2, 20, 0, 0, tzinfo=timezone.utc), datetime(2024, 3, 1, 0, 0, 0, tzinfo=timezone.utc))
+                (datetime(2024, 2, 20, 0, 0, tzinfo=timezone.utc), datetime(2024, 3, 1, 0, 0, 0, tzinfo=timezone.utc)),
             ],
             id="test_datetime_based_cursor_all_fields",
         ),
@@ -630,12 +625,12 @@ class ConcurrentCursorStateTest(TestCase):
                         "end": "2024-02-10T00:00:00.000000+0000",
                     }
                 ],
-                "state_type": "date-range"
+                "state_type": "date-range",
             },
             [
                 (datetime(2024, 2, 5, 0, 0, 0, tzinfo=timezone.utc), datetime(2024, 2, 14, 23, 59, 59, tzinfo=timezone.utc)),
                 (datetime(2024, 2, 15, 0, 0, 0, tzinfo=timezone.utc), datetime(2024, 2, 24, 23, 59, 59, tzinfo=timezone.utc)),
-                (datetime(2024, 2, 25, 0, 0, 0, tzinfo=timezone.utc), datetime(2024, 3, 1, 0, 0, 0, tzinfo=timezone.utc))
+                (datetime(2024, 2, 25, 0, 0, 0, tzinfo=timezone.utc), datetime(2024, 3, 1, 0, 0, 0, tzinfo=timezone.utc)),
             ],
             id="test_datetime_based_cursor_with_state",
         ),
@@ -652,7 +647,7 @@ class ConcurrentCursorStateTest(TestCase):
                         "end": "2024-01-21T00:00:00.000000+0000",
                     }
                 ],
-                "state_type": "date-range"
+                "state_type": "date-range",
             },
             [
                 (datetime(2024, 1, 20, 0, 0, tzinfo=timezone.utc), datetime(2024, 2, 8, 23, 59, 59, tzinfo=timezone.utc)),
@@ -675,7 +670,7 @@ class ConcurrentCursorStateTest(TestCase):
             ],
             id="test_datetime_based_cursor_using_large_step_duration",
         ),
-    ]
+    ],
 )
 def test_generate_slices_concurrent_cursor_from_datetime_based_cursor(
     start_datetime,
@@ -758,10 +753,7 @@ def test_observe_concurrent_cursor_from_datetime_based_cursor():
     message_repository = Mock(spec=MessageRepository)
     state_manager = Mock(spec=ConnectorStateManager)
 
-    config = {
-        "start_time": "2024-08-01T00:00:00.000000+0000",
-        "dynamic_cursor_key": "updated_at"
-    }
+    config = {"start_time": "2024-08-01T00:00:00.000000+0000", "dynamic_cursor_key": "updated_at"}
 
     datetime_based_cursor = DatetimeBasedCursor(
         start_datetime=MinMaxDatetime(datetime="{{ config.start_time }}", parameters={}),
@@ -799,13 +791,16 @@ def test_observe_concurrent_cursor_from_datetime_based_cursor():
     )
 
     record_1 = Record(
-        partition=partition, data={"id": "999", "updated_at": "2024-08-23T00:00:00.000000+0000", "name": "kratos", "mythology": "greek"},
+        partition=partition,
+        data={"id": "999", "updated_at": "2024-08-23T00:00:00.000000+0000", "name": "kratos", "mythology": "greek"},
     )
     record_2 = Record(
-        partition=partition, data={"id": "1000", "updated_at": "2024-08-22T00:00:00.000000+0000", "name": "odin", "mythology": "norse"},
+        partition=partition,
+        data={"id": "1000", "updated_at": "2024-08-22T00:00:00.000000+0000", "name": "odin", "mythology": "norse"},
     )
     record_3 = Record(
-        partition=partition, data={"id": "500", "updated_at": "2024-08-24T00:00:00.000000+0000", "name": "freya", "mythology": "norse"},
+        partition=partition,
+        data={"id": "500", "updated_at": "2024-08-24T00:00:00.000000+0000", "name": "freya", "mythology": "norse"},
     )
 
     concurrent_cursor.observe(record_1)
@@ -826,10 +821,7 @@ def test_close_partition_concurrent_cursor_from_datetime_based_cursor():
     message_repository = Mock(spec=MessageRepository)
     state_manager = Mock(spec=ConnectorStateManager)
 
-    config = {
-        "start_time": "2024-08-01T00:00:00.000000+0000",
-        "dynamic_cursor_key": "updated_at"
-    }
+    config = {"start_time": "2024-08-01T00:00:00.000000+0000", "dynamic_cursor_key": "updated_at"}
 
     datetime_based_cursor = DatetimeBasedCursor(
         start_datetime=MinMaxDatetime(datetime="{{ config.start_time }}", parameters={}),
@@ -867,7 +859,8 @@ def test_close_partition_concurrent_cursor_from_datetime_based_cursor():
     )
 
     record_1 = Record(
-        partition=partition, data={"id": "999", "updated_at": "2024-08-23T00:00:00.000000+0000", "name": "kratos", "mythology": "greek"},
+        partition=partition,
+        data={"id": "999", "updated_at": "2024-08-23T00:00:00.000000+0000", "name": "kratos", "mythology": "greek"},
     )
     concurrent_cursor.observe(record_1)
 
@@ -878,8 +871,14 @@ def test_close_partition_concurrent_cursor_from_datetime_based_cursor():
         "gods",
         _A_STREAM_NAMESPACE,
         {
-            "slices": [{"end": "2024-08-23T00:00:00.000Z", "start": "2024-08-01T00:00:00.000Z", "most_recent_cursor_value": "2024-08-23T00:00:00.000Z"}],
-            "state_type": "date-range"
+            "slices": [
+                {
+                    "end": "2024-08-23T00:00:00.000Z",
+                    "start": "2024-08-01T00:00:00.000Z",
+                    "most_recent_cursor_value": "2024-08-23T00:00:00.000Z",
+                }
+            ],
+            "state_type": "date-range",
         },
     )
 
@@ -889,10 +888,7 @@ def test_close_partition_with_slice_range_concurrent_cursor_from_datetime_based_
     message_repository = Mock(spec=MessageRepository)
     state_manager = Mock(spec=ConnectorStateManager)
 
-    config = {
-        "start_time": "2024-07-01T00:00:00.000000+0000",
-        "dynamic_cursor_key": "updated_at"
-    }
+    config = {"start_time": "2024-07-01T00:00:00.000000+0000", "dynamic_cursor_key": "updated_at"}
 
     datetime_based_cursor = DatetimeBasedCursor(
         start_datetime=MinMaxDatetime(datetime="{{ config.start_time }}", parameters={}),
@@ -932,16 +928,20 @@ def test_close_partition_with_slice_range_concurrent_cursor_from_datetime_based_
     )
 
     partition_0 = _partition(
-        {"start_time": "2024-07-01T00:00:00.000000+0000", "end_time": "2024-07-16T00:00:00.000000+0000"}, _stream_name="gods",
+        {"start_time": "2024-07-01T00:00:00.000000+0000", "end_time": "2024-07-16T00:00:00.000000+0000"},
+        _stream_name="gods",
     )
     partition_3 = _partition(
-        {"start_time": "2024-08-15T00:00:00.000000+0000", "end_time": "2024-08-30T00:00:00.000000+0000"}, _stream_name="gods",
+        {"start_time": "2024-08-15T00:00:00.000000+0000", "end_time": "2024-08-30T00:00:00.000000+0000"},
+        _stream_name="gods",
     )
     record_1 = Record(
-        partition=partition_0, data={"id": "1000", "updated_at": "2024-07-05T00:00:00.000000+0000", "name": "loki", "mythology": "norse"},
+        partition=partition_0,
+        data={"id": "1000", "updated_at": "2024-07-05T00:00:00.000000+0000", "name": "loki", "mythology": "norse"},
     )
     record_2 = Record(
-        partition=partition_3, data={"id": "999", "updated_at": "2024-08-20T00:00:00.000000+0000", "name": "kratos", "mythology": "greek"},
+        partition=partition_3,
+        data={"id": "999", "updated_at": "2024-08-20T00:00:00.000000+0000", "name": "kratos", "mythology": "greek"},
     )
 
     concurrent_cursor.observe(record_1)
@@ -956,10 +956,18 @@ def test_close_partition_with_slice_range_concurrent_cursor_from_datetime_based_
         _A_STREAM_NAMESPACE,
         {
             "slices": [
-                {"start": "2024-07-01T00:00:00.000Z", "end": "2024-07-16T00:00:00.000Z", "most_recent_cursor_value": "2024-07-05T00:00:00.000Z"},
-                {"start": "2024-08-15T00:00:00.000Z", "end": "2024-08-30T00:00:00.000Z", "most_recent_cursor_value": "2024-08-20T00:00:00.000Z"},
+                {
+                    "start": "2024-07-01T00:00:00.000Z",
+                    "end": "2024-07-16T00:00:00.000Z",
+                    "most_recent_cursor_value": "2024-07-05T00:00:00.000Z",
+                },
+                {
+                    "start": "2024-08-15T00:00:00.000Z",
+                    "end": "2024-08-30T00:00:00.000Z",
+                    "most_recent_cursor_value": "2024-08-20T00:00:00.000Z",
+                },
             ],
-            "state_type": "date-range"
+            "state_type": "date-range",
         },
     )
     assert state_manager.update_state_for_stream.call_count == 2
@@ -970,10 +978,7 @@ def test_close_partition_with_slice_range_granularity_concurrent_cursor_from_dat
     message_repository = Mock(spec=MessageRepository)
     state_manager = Mock(spec=ConnectorStateManager)
 
-    config = {
-        "start_time": "2024-07-01T00:00:00.000000+0000",
-        "dynamic_cursor_key": "updated_at"
-    }
+    config = {"start_time": "2024-07-01T00:00:00.000000+0000", "dynamic_cursor_key": "updated_at"}
 
     datetime_based_cursor = DatetimeBasedCursor(
         start_datetime=MinMaxDatetime(datetime="{{ config.start_time }}", parameters={}),
@@ -1015,22 +1020,28 @@ def test_close_partition_with_slice_range_granularity_concurrent_cursor_from_dat
     )
 
     partition_0 = _partition(
-        {"start_time": "2024-07-01T00:00:00.000000+0000", "end_time": "2024-07-15T00:00:00.000000+0000"}, _stream_name="gods",
+        {"start_time": "2024-07-01T00:00:00.000000+0000", "end_time": "2024-07-15T00:00:00.000000+0000"},
+        _stream_name="gods",
     )
     partition_1 = _partition(
-        {"start_time": "2024-07-16T00:00:00.000000+0000", "end_time": "2024-07-31T00:00:00.000000+0000"}, _stream_name="gods",
+        {"start_time": "2024-07-16T00:00:00.000000+0000", "end_time": "2024-07-31T00:00:00.000000+0000"},
+        _stream_name="gods",
     )
     partition_3 = _partition(
-        {"start_time": "2024-08-15T00:00:00.000000+0000", "end_time": "2024-08-29T00:00:00.000000+0000"}, _stream_name="gods",
+        {"start_time": "2024-08-15T00:00:00.000000+0000", "end_time": "2024-08-29T00:00:00.000000+0000"},
+        _stream_name="gods",
     )
     record_1 = Record(
-        partition=partition_0, data={"id": "1000", "updated_at": "2024-07-05T00:00:00.000000+0000", "name": "loki", "mythology": "norse"},
+        partition=partition_0,
+        data={"id": "1000", "updated_at": "2024-07-05T00:00:00.000000+0000", "name": "loki", "mythology": "norse"},
     )
     record_2 = Record(
-        partition=partition_1, data={"id": "2000", "updated_at": "2024-07-25T00:00:00.000000+0000", "name": "freya", "mythology": "norse"},
+        partition=partition_1,
+        data={"id": "2000", "updated_at": "2024-07-25T00:00:00.000000+0000", "name": "freya", "mythology": "norse"},
     )
     record_3 = Record(
-        partition=partition_3, data={"id": "999", "updated_at": "2024-08-20T00:00:00.000000+0000", "name": "kratos", "mythology": "greek"},
+        partition=partition_3,
+        data={"id": "999", "updated_at": "2024-08-20T00:00:00.000000+0000", "name": "kratos", "mythology": "greek"},
     )
 
     concurrent_cursor.observe(record_1)
@@ -1047,11 +1058,18 @@ def test_close_partition_with_slice_range_granularity_concurrent_cursor_from_dat
         _A_STREAM_NAMESPACE,
         {
             "slices": [
-                {"start": "2024-07-01T00:00:00.000Z", "end": "2024-07-31T00:00:00.000Z", "most_recent_cursor_value": "2024-07-25T00:00:00.000Z"},
-                {"start": "2024-08-15T00:00:00.000Z", "end": "2024-08-29T00:00:00.000Z", "most_recent_cursor_value": "2024-08-20T00:00:00.000Z"}
-
+                {
+                    "start": "2024-07-01T00:00:00.000Z",
+                    "end": "2024-07-31T00:00:00.000Z",
+                    "most_recent_cursor_value": "2024-07-25T00:00:00.000Z",
+                },
+                {
+                    "start": "2024-08-15T00:00:00.000Z",
+                    "end": "2024-08-29T00:00:00.000Z",
+                    "most_recent_cursor_value": "2024-08-20T00:00:00.000Z",
+                },
             ],
-            "state_type": "date-range"
+            "state_type": "date-range",
         },
     )
     assert state_manager.update_state_for_stream.call_count == 3

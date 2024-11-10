@@ -256,7 +256,7 @@ class TestFileBasedErrorCollector:
 
 class DefaultFileBasedStreamFileTransferTest(unittest.TestCase):
     _NOW = datetime(2022, 10, 22, tzinfo=timezone.utc)
-    _A_RECORD = {'bytes': 10, 'file_relative_path': 'relative/path/file.csv', 'file_url': '/absolute/path/file.csv'}
+    _A_RECORD = {"bytes": 10, "file_relative_path": "relative/path/file.csv", "file_url": "/absolute/path/file.csv"}
 
     def setUp(self) -> None:
         self._stream_config = Mock()
@@ -281,7 +281,7 @@ class DefaultFileBasedStreamFileTransferTest(unittest.TestCase):
             validation_policy=self._validation_policy,
             cursor=self._cursor,
             errors_collector=FileBasedErrorsCollector(),
-            use_file_transfer=True
+            use_file_transfer=True,
         )
 
     def test_when_read_records_from_slice_then_return_records(self) -> None:

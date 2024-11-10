@@ -41,7 +41,6 @@ def test_given_error_code_in_response_http_status_error_handler_returns_expected
 
 
 def test_given_no_response_argument_returns_expected_action():
-
     error_resolution = HttpStatusErrorHandler(logger).interpret_response()
 
     assert error_resolution.response_action == ResponseAction.FAIL
@@ -49,7 +48,6 @@ def test_given_no_response_argument_returns_expected_action():
 
 
 def test_given_unmapped_status_error_returns_retry_action_as_transient_error():
-
     response = requests.Response()
     response.status_code = 508
 
@@ -61,7 +59,6 @@ def test_given_unmapped_status_error_returns_retry_action_as_transient_error():
 
 
 def test_given_requests_exception_returns_retry_action_as_transient_error():
-
     error_resolution = HttpStatusErrorHandler(logger).interpret_response(requests.RequestException())
 
     assert error_resolution.response_action == ResponseAction.RETRY
@@ -69,7 +66,6 @@ def test_given_requests_exception_returns_retry_action_as_transient_error():
 
 
 def test_given_unmapped_exception_returns_retry_action_as_system_error():
-
     error_resolution = HttpStatusErrorHandler(logger).interpret_response(Exception())
 
     assert error_resolution.response_action == ResponseAction.RETRY
@@ -77,7 +73,6 @@ def test_given_unmapped_exception_returns_retry_action_as_system_error():
 
 
 def test_given_unexpected_response_type_returns_fail_action_as_system_error():
-
     error_resolution = HttpStatusErrorHandler(logger).interpret_response("unexpected response type")
 
     assert error_resolution.response_action == ResponseAction.FAIL
@@ -86,7 +81,6 @@ def test_given_unexpected_response_type_returns_fail_action_as_system_error():
 
 
 def test_given_injected_error_mapping_returns_expected_action():
-
     default_error_handler = HttpStatusErrorHandler(logger)
 
     mock_response = MagicMock(spec=requests.Response)

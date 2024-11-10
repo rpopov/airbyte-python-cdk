@@ -34,7 +34,6 @@ class FixtureAvailabilityStrategy(HttpAvailabilityStrategy):
 
 
 class IntegrationStream(HttpStream, ABC):
-
     url_base = "https://api.airbyte-test.com/v1/"
     primary_key = "id"
     page_size = 100

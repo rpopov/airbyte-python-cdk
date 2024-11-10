@@ -102,7 +102,6 @@ class AsyncRetriever(Retriever):
         records_schema: Mapping[str, Any],
         stream_slice: Optional[StreamSlice] = None,
     ) -> Iterable[StreamData]:
-
         stream_state: StreamState = self._get_stream_state()
         partition: AsyncPartition = self._validate_and_get_stream_slice_partition(stream_slice)
         records: Iterable[Mapping[str, Any]] = self._job_orchestrator.fetch_records(partition)

@@ -20,8 +20,8 @@ jobs:
           dispatch-type: workflow
           issue-type: pull-request
           commands: |
-            fix-pr
-            test-pr
+            autofix
+            test
             poetry-lock
           static-args: |
             pr=${{ github.event.issue.number }}

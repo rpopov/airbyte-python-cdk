@@ -145,7 +145,7 @@ class HttpJobRepositoryTest(TestCase):
                 HttpResponse(body=json.dumps({"id": _A_JOB_ID, "status": "pending"})),
                 HttpResponse(body=json.dumps({"id": _A_JOB_ID, "status": "failure"})),
                 HttpResponse(body=json.dumps({"id": _A_JOB_ID, "status": "ready"})),
-            ]
+            ],
         )
         job = self._repository.start(_ANY_SLICE)
 
@@ -195,11 +195,7 @@ class HttpJobRepositoryTest(TestCase):
         self._mock_create_response(_A_JOB_ID)
         self._http_mocker.get(
             HttpRequest(url=f"{_EXPORT_URL}/{_A_JOB_ID}"),
-            HttpResponse(body=json.dumps({
-                "id": _A_JOB_ID,
-                "status": "ready",
-                "urls": [_JOB_FIRST_URL]
-            }))
+            HttpResponse(body=json.dumps({"id": _A_JOB_ID, "status": "ready", "urls": [_JOB_FIRST_URL]})),
         )
         self._http_mocker.get(
             HttpRequest(url=_JOB_FIRST_URL),
@@ -220,14 +216,18 @@ class HttpJobRepositoryTest(TestCase):
         self._mock_create_response(_A_JOB_ID)
         self._http_mocker.get(
             HttpRequest(url=f"{_EXPORT_URL}/{_A_JOB_ID}"),
-            HttpResponse(body=json.dumps({
-                "id": _A_JOB_ID,
-                "status": "ready",
-                "urls": [
-                    _JOB_FIRST_URL,
-                    _JOB_SECOND_URL,
-                ]
-            }))
+            HttpResponse(
+                body=json.dumps(
+                    {
+                        "id": _A_JOB_ID,
+                        "status": "ready",
+                        "urls": [
+                            _JOB_FIRST_URL,
+                            _JOB_SECOND_URL,
+                        ],
+                    }
+                )
+            ),
         )
         self._http_mocker.get(
             HttpRequest(url=_JOB_FIRST_URL),

@@ -385,12 +385,7 @@ def test_cursor_partition_generator():
     cursor.generate_slices.return_value = [(datetime.datetime(year=2024, month=1, day=1), datetime.datetime(year=2024, month=1, day=2))]
 
     partition_generator = CursorPartitionGenerator(
-        stream,
-        message_repository,
-        cursor,
-        connector_state_converter,
-        cursor_field,
-        slice_boundary_fields
+        stream, message_repository, cursor, connector_state_converter, cursor_field, slice_boundary_fields
     )
 
     partitions = list(partition_generator.generate())

@@ -301,7 +301,6 @@ class HttpRequester(Requester):
         request_body_json: Optional[Mapping[str, Any]] = None,
         log_formatter: Optional[Callable[[requests.Response], Any]] = None,
     ) -> Optional[requests.Response]:
-
         request, response = self._http_client.send_request(
             http_method=self.get_method().value,
             url=self._join_url(

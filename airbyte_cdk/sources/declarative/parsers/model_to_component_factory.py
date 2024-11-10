@@ -185,7 +185,6 @@ ComponentDefinition = Mapping[str, Any]
 
 
 class ModelToComponentFactory:
-
     EPOCH_DATETIME_FORMAT = "%s"
 
     def __init__(
@@ -401,7 +400,9 @@ class ModelToComponentFactory:
         if not hasattr(partition_router, "parent_stream_configs"):
             raise ValueError("LegacyToPerPartitionStateMigrations can only be applied with a parent stream configuration.")
 
-        return LegacyToPerPartitionStateMigration(declarative_stream.retriever.partition_router, declarative_stream.incremental_sync, config, declarative_stream.parameters)  # type: ignore # The retriever type was already checked
+        return LegacyToPerPartitionStateMigration(
+            declarative_stream.retriever.partition_router, declarative_stream.incremental_sync, config, declarative_stream.parameters
+        )  # type: ignore # The retriever type was already checked
 
     def create_session_token_authenticator(
         self, model: SessionTokenAuthenticatorModel, config: Config, name: str, **kwargs: Any
@@ -483,7 +484,6 @@ class ModelToComponentFactory:
         stream_state: MutableMapping[str, Any],
         **kwargs: Any,
     ) -> Tuple[ConcurrentCursor, DateTimeStreamStateConverter]:
-
         component_type = component_definition.get("type")
         if component_definition.get("type") != model_type.__name__:
             raise ValueError(f"Expected manifest component of type {model_type.__name__}, but received {component_type} instead")
@@ -1474,7 +1474,6 @@ class ModelToComponentFactory:
         transformations: List[RecordTransformation],
         **kwargs: Any,
     ) -> AsyncRetriever:
-
         decoder = self._create_component_from_model(model=model.decoder, config=config) if model.decoder else JsonDecoder(parameters={})
         record_selector = self._create_component_from_model(
             model=model.record_selector,

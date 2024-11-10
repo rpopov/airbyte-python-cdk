@@ -16,7 +16,6 @@ from orjson import orjson
 
 
 class JsonlParser(FileTypeParser):
-
     MAX_BYTES_PER_FILE_FOR_SCHEMA_INFERENCE = 1_000_000
     ENCODING = "utf8"
 

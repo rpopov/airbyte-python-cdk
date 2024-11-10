@@ -98,14 +98,12 @@ class DefaultErrorHandler(ErrorHandler):
     backoff_strategies: Optional[List[BackoffStrategy]] = None
 
     def __post_init__(self, parameters: Mapping[str, Any]) -> None:
-
         if not self.response_filters:
             self.response_filters = [HttpResponseFilter(config=self.config, parameters={})]
 
         self._last_request_to_attempt_count: MutableMapping[requests.PreparedRequest, int] = {}
 
     def interpret_response(self, response_or_exception: Optional[Union[requests.Response, Exception]]) -> ErrorResolution:
-
         if self.response_filters:
             for response_filter in self.response_filters:
                 matched_error_resolution = response_filter.matches(response_or_exception=response_or_exception)

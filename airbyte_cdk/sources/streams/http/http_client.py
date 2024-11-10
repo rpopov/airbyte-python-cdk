@@ -69,7 +69,6 @@ class MessageRepresentationAirbyteTracedErrors(AirbyteTracedException):
 
 
 class HttpClient:
-
     _DEFAULT_MAX_RETRY: int = 5
     _DEFAULT_MAX_TIME: int = 60 * 10
 
@@ -233,7 +232,9 @@ class HttpClient:
         rate_limit_backoff_handler = rate_limit_default_backoff_handler()
         backoff_handler = http_client_default_backoff_handler(max_tries=max_tries, max_time=max_time)
         # backoff handlers wrap _send, so it will always return a response
-        response = backoff_handler(rate_limit_backoff_handler(user_backoff_handler))(request, request_kwargs, log_formatter=log_formatter, exit_on_rate_limit=exit_on_rate_limit)  # type: ignore # mypy can't infer that backoff_handler wraps _send
+        response = backoff_handler(rate_limit_backoff_handler(user_backoff_handler))(
+            request, request_kwargs, log_formatter=log_formatter, exit_on_rate_limit=exit_on_rate_limit
+        )  # type: ignore # mypy can't infer that backoff_handler wraps _send
 
         return response
 
@@ -244,7 +245,6 @@ class HttpClient:
         log_formatter: Optional[Callable[[requests.Response], Any]] = None,
         exit_on_rate_limit: Optional[bool] = False,
     ) -> requests.Response:
-
         if request not in self._request_attempt_count:
             self._request_attempt_count[request] = 1
         else:

@@ -45,7 +45,6 @@ async def main():
     init_module_content = generate_init_module_content()
 
     async with dagger.Connection(dagger.Config(log_output=sys.stderr)) as dagger_client:
-
         codegen_container = (
             dagger_client.container()
             .from_(PYTHON_IMAGE)
@@ -70,7 +69,7 @@ async def main():
                 use_entrypoint=True,
             )
 
-        await ((await post_process_codegen(codegen_container)).directory("/generated_post_processed").export(LOCAL_OUTPUT_DIR_PATH))
+        await (await post_process_codegen(codegen_container)).directory("/generated_post_processed").export(LOCAL_OUTPUT_DIR_PATH)
 
 
 anyio.run(main)

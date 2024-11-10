@@ -16,9 +16,7 @@ def mock_sleep(monkeypatch):
 
 
 def pytest_addoption(parser):
-    parser.addoption(
-        "--skipslow", action="store_true", default=False, help="skip slow tests"
-    )
+    parser.addoption("--skipslow", action="store_true", default=False, help="skip slow tests")
 
 
 def pytest_configure(config):

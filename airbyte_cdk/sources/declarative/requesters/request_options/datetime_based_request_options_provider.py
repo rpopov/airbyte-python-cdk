@@ -74,5 +74,7 @@ class DatetimeBasedRequestOptionsProvider(RequestOptionsProvider):
                 self._partition_field_start.eval(self.config)
             )
         if self.end_time_option and self.end_time_option.inject_into == option_type:
-            options[self.end_time_option.field_name.eval(config=self.config)] = stream_slice.get(self._partition_field_end.eval(self.config))  # type: ignore # field_name is always casted to an interpolated string
+            options[self.end_time_option.field_name.eval(config=self.config)] = stream_slice.get(
+                self._partition_field_end.eval(self.config)
+            )  # type: ignore # field_name is always casted to an interpolated string
         return options
