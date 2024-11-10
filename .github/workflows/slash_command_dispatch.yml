@@ -10,7 +10,6 @@ jobs:
     if: ${{ github.event.issue.pull_request }}
     runs-on: ubuntu-latest
     steps:
-
       - name: Slash Command Dispatch
         id: dispatch
         uses: peter-evans/slash-command-dispatch@v4
