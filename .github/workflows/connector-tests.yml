@@ -99,7 +99,7 @@ jobs:
         if: ${{ matrix.cdk_extra != 'n/a' && needs.cdk_changes.outputs[matrix.cdk_extra] == 'false' }}
         run: |
             echo "Aborting job as specified extra not changed: ${{matrix.cdk_extra}} = ${{ needs.cdk_changes.outputs[matrix.cdk_extra] }}"
-            echo "::set-output name=status::cancelled"
+            echo "status=cancelled" >> $GITHUB_OUTPUT
             exit 1
         continue-on-error: true
       # Get the monorepo so we can test the connectors
