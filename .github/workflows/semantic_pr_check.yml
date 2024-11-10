@@ -8,9 +8,6 @@ on:
       - synchronize
       - ready_for_review
 
-env:
-  AIRBYTE_ANALYTICS_ID: ${{ vars.AIRBYTE_ANALYTICS_ID }}
-
 permissions:
   pull-requests: read
 
@@ -27,12 +24,19 @@ jobs:
           # Configure which types are allowed (newline-delimited).
           # See: https://github.com/commitizen/conventional-commit-types/blob/master/index.json
           types: |
+            fix
             Fix
+            feat
             Feat
+            docs
             Docs
+            ci
             CI
+            chore
             Chore
+            build
             Build
+            test
             Test
 
           # # We don't use scopes as of now
@@ -46,5 +50,5 @@ jobs:
           # The variables `subject` and `title` can be used within the message.
           subjectPatternError: |
             The subject "{subject}" found in the pull request title "{title}"
-            didn't match the configured pattern. Please ensure that the subject
-            start with an uppercase character.
+            didn't match the configured pattern. Please check the title against
+            the naming rules.
