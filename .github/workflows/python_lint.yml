@@ -30,7 +30,7 @@ jobs:
       run: poetry install --all-extras
 
     # Job-specifc step(s):
-    - name: Format code
+    - name: Run lint check
       run: poetry run ruff check .
 
   ruff-format-check:
