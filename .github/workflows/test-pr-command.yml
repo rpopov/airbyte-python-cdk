@@ -12,9 +12,6 @@ on:
         type: string
         required: false
 
-env:
-  AIRBYTE_ANALYTICS_ID: ${{ vars.AIRBYTE_ANALYTICS_ID }}
-
 jobs:
   start-workflow:
     name: Append 'Starting' Comment
