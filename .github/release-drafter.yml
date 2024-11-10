@@ -17,7 +17,7 @@ categories:
       - 'refactor'
   - title: 'Documentation 📖'
     label: 'docs'
-change-template: '- $TITLE @$AUTHOR (#$NUMBER)'
+change-template: '- $SUBJECT (#$NUMBER) - **_Thanks, @$AUTHOR_**!'
 change-title-escapes: '\<*_&' # You can add # and @ to disable mentions, and add ` to disable code blocks.
 version-resolver:
   major:
@@ -37,10 +37,13 @@ template: |
 autolabeler:
   - label: 'chore'
     title:
-      - '/chore\:/i'
+      - '/^chore(\(.*\))?\:/i'
+  - label: 'ci'
+    title:
+      - '/^ci(\(.*\))?\:/i'
   - label: 'bug'
     title:
-      - '/fix\:/i'
+      - '/^fix(\(.*\))?\:/i'
   - label: 'enhancement'
     title:
-      - '/feature/i'
+      - '/^feat(\(.*\))?/i'
