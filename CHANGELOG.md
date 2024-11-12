@@ -1,3 +1,7 @@
+# Release Notes
+
+Newer updates can be found here: [GitHub Release Notes](https://github.com/airbytehq/airbyte-python-cdk/releases)
+
 # Changelog
 
 ## 6.5.2
