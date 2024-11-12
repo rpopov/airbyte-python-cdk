@@ -256,7 +256,10 @@ class ManifestDeclarativeSource(DeclarativeSource):
             manifest_version, "manifest"
         )
 
-        if cdk_major < manifest_major or (
+        if cdk_version.startswith("0.0.0"):
+            # Skipping version compatibility check on unreleased dev branch
+            pass
+        elif cdk_major < manifest_major or (
             cdk_major == manifest_major and cdk_minor < manifest_minor
         ):
             raise ValidationError(

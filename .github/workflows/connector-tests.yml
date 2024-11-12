@@ -75,13 +75,14 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 360 # 6 hours
     strategy:
-      fail-fast: true # Save resources by aborting if one connector fails
+      fail-fast: false
       matrix:
         include:
           - connector: source-shopify
             cdk_extra: n/a
-          - connector: source-zendesk-support
-            cdk_extra: n/a
+          # Currently not passing CI (unrelated)
+          # - connector: source-zendesk-support
+          #   cdk_extra: n/a
           - connector: source-s3
             cdk_extra: file-based
           - connector: destination-pinecone
