@@ -4,6 +4,7 @@ WORKDIR /airbyte/integration_code
 
 # Copy project files needed for build
 COPY pyproject.toml poetry.lock README.md ./
+COPY dist/*.whl ./dist/
 
 # Install dependencies - ignore keyring warnings
 RUN poetry config virtualenvs.create false \
@@ -13,6 +14,6 @@ RUN poetry config virtualenvs.create false \
 COPY airbyte_cdk ./airbyte_cdk
 
 # Build and install the package
-RUN poetry build && pip install dist/*.whl
+RUN pip install dist/*.whl
 
 ENTRYPOINT ["poetry", "run", "source-declarative-manifest"]
