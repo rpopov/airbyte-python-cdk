@@ -72,12 +72,14 @@ jobs:
             cdk_extra: n/a
           - connector: source-shopify
             cdk_extra: n/a
-          - connector: source-chargebee
-            cdk_extra: n/a
-          - connector: source-s3
-            cdk_extra: file-based
-          - connector: destination-pinecone
-            cdk_extra: vector-db-based
+          # Chargebee is being flaky:
+          # - connector: source-chargebee
+          #   cdk_extra: n/a
+          # These two are behind in CDK updates and can't be used as tests until they are updated:
+          # - connector: source-s3
+          #   cdk_extra: file-based
+          # - connector: destination-pinecone
+          #   cdk_extra: vector-db-based
           - connector: destination-motherduck
             cdk_extra: sql
           # ZenDesk currently failing (as of 2024-12-02)
@@ -91,7 +93,7 @@ jobs:
           # - connector: source-pokeapi
           #   cdk_extra: n/a
 
-    name: "Check: '${{matrix.connector}}' (skip=${{needs.cdk_changes.outputs[matrix.cdk_extra] == 'false'}})"
+    name: "Check: '${{matrix.connector}}' (skip=${{needs.cdk_changes.outputs['src'] == 'false' || needs.cdk_changes.outputs[matrix.cdk_extra] == 'false'}})"
     steps:
       - name: Abort if extra not changed (${{matrix.cdk_extra}})
         id: no_changes
