@@ -1192,8 +1192,10 @@ class ComponentMappingDefinition(BaseModel):
         examples=[
             ["data"],
             ["data", "records"],
-            ["data", "{{ parameters.name }}"],
+            ["data", 1, "name"],
+            ["data", "{{ components_values.name }}"],
             ["data", "*", "record"],
+            ["*", "**", "name"],
         ],
         title="Field Path",
     )
@@ -1212,6 +1214,24 @@ class ComponentMappingDefinition(BaseModel):
         description="The expected data type of the value. If omitted, the type will be inferred from the value provided.",
         title="Value Type",
     )
+    parameters: Optional[Dict[str, Any]] = Field(None, alias="$parameters")
+
+
+class StreamConfig(BaseModel):
+    type: Literal["StreamConfig"]
+    configs_pointer: List[str] = Field(
+        ...,
+        description="A list of potentially nested fields indicating the full path in source config file where streams configs located.",
+        examples=[["data"], ["data", "streams"], ["data", "{{ parameters.name }}"]],
+        title="Configs Pointer",
+    )
+    parameters: Optional[Dict[str, Any]] = Field(None, alias="$parameters")
+
+
+class ConfigComponentsResolver(BaseModel):
+    type: Literal["ConfigComponentsResolver"]
+    stream_config: StreamConfig
+    components_mapping: List[ComponentMappingDefinition]
     parameters: Optional[Dict[str, Any]] = Field(None, alias="$parameters")
 
 
@@ -2010,7 +2030,7 @@ class DynamicDeclarativeStream(BaseModel):
     stream_template: DeclarativeStream = Field(
         ..., description="Reference to the stream template.", title="Stream Template"
     )
-    components_resolver: HttpComponentsResolver = Field(
+    components_resolver: Union[HttpComponentsResolver, ConfigComponentsResolver] = Field(
         ...,
         description="Component resolve and populates stream templates with components values.",
         title="Components Resolver",
