@@ -1671,6 +1671,7 @@ class DeclarativeStream(BaseModel):
                 RemoveFields,
                 KeysToLower,
                 KeysToSnakeCase,
+                FlattenFields,
             ]
         ]
     ] = Field(
@@ -1835,6 +1836,22 @@ class DynamicSchemaLoader(BaseModel):
         ...,
         description="Component used to coordinate how records are extracted across stream slices and request pages.",
         title="Retriever",
+    )
+    schema_transformations: Optional[
+        List[
+            Union[
+                AddFields,
+                CustomTransformation,
+                RemoveFields,
+                KeysToLower,
+                KeysToSnakeCase,
+                FlattenFields,
+            ]
+        ]
+    ] = Field(
+        None,
+        description="A list of transformations to be applied to the schema.",
+        title="Schema Transformations",
     )
     schema_type_identifier: SchemaTypeIdentifier
     parameters: Optional[Dict[str, Any]] = Field(None, alias="$parameters")

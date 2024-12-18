@@ -240,6 +240,9 @@ from airbyte_cdk.sources.declarative.models.declarative_component_schema import 
     KeysToLower as KeysToLowerModel,
 )
 from airbyte_cdk.sources.declarative.models.declarative_component_schema import (
+    KeysToSnakeCase as KeysToSnakeCaseModel,
+)
+from airbyte_cdk.sources.declarative.models.declarative_component_schema import (
     LegacySessionTokenAuthenticator as LegacySessionTokenAuthenticatorModel,
 )
 from airbyte_cdk.sources.declarative.models.declarative_component_schema import (
@@ -396,6 +399,9 @@ from airbyte_cdk.sources.declarative.transformations.flatten_fields import (
 from airbyte_cdk.sources.declarative.transformations.keys_to_lower_transformation import (
     KeysToLowerTransformation,
 )
+from airbyte_cdk.sources.declarative.transformations.keys_to_snake_transformation import (
+    KeysToSnakeCaseTransformation,
+)
 from airbyte_cdk.sources.message import (
     InMemoryMessageRepository,
     LogAppenderMessageRepositoryDecorator,
@@ -478,6 +484,7 @@ class ModelToComponentFactory:
             JsonlDecoderModel: self.create_jsonl_decoder,
             GzipJsonDecoderModel: self.create_gzipjson_decoder,
             KeysToLowerModel: self.create_keys_to_lower_transformation,
+            KeysToSnakeCaseModel: self.create_keys_to_snake_transformation,
             FlattenFieldsModel: self.create_flatten_fields,
             IterableDecoderModel: self.create_iterable_decoder,
             XmlDecoderModel: self.create_xml_decoder,
@@ -593,6 +600,11 @@ class ModelToComponentFactory:
         self, model: KeysToLowerModel, config: Config, **kwargs: Any
     ) -> KeysToLowerTransformation:
         return KeysToLowerTransformation()
+
+    def create_keys_to_snake_transformation(
+        self, model: KeysToSnakeCaseModel, config: Config, **kwargs: Any
+    ) -> KeysToSnakeCaseTransformation:
+        return KeysToSnakeCaseTransformation()
 
     def create_flatten_fields(
         self, model: FlattenFieldsModel, config: Config, **kwargs: Any
@@ -1650,6 +1662,13 @@ class ModelToComponentFactory:
             model.retriever, stream_slicer
         )
 
+        schema_transformations = []
+        if model.schema_transformations:
+            for transformation_model in model.schema_transformations:
+                schema_transformations.append(
+                    self._create_component_from_model(model=transformation_model, config=config)
+                )
+
         retriever = self._create_component_from_model(
             model=model.retriever,
             config=config,
@@ -1664,6 +1683,7 @@ class ModelToComponentFactory:
         return DynamicSchemaLoader(
             retriever=retriever,
             config=config,
+            schema_transformations=schema_transformations,
             schema_type_identifier=schema_type_identifier,
             parameters=model.parameters or {},
         )
