@@ -329,6 +329,9 @@ from airbyte_cdk.sources.declarative.partition_routers import (
     SinglePartitionRouter,
     SubstreamPartitionRouter,
 )
+from airbyte_cdk.sources.declarative.partition_routers.async_job_partition_router import (
+    AsyncJobPartitionRouter,
+)
 from airbyte_cdk.sources.declarative.partition_routers.substream_partition_router import (
     ParentStreamConfig,
 )
@@ -2260,18 +2263,24 @@ class ModelToComponentFactory:
             urls_extractor=urls_extractor,
         )
 
-        return AsyncRetriever(
+        async_job_partition_router = AsyncJobPartitionRouter(
             job_orchestrator_factory=lambda stream_slices: AsyncJobOrchestrator(
                 job_repository,
                 stream_slices,
-                JobTracker(
-                    1
-                ),  # FIXME eventually make the number of concurrent jobs in the API configurable. Until then, we limit to 1
+                JobTracker(1),
+                # FIXME eventually make the number of concurrent jobs in the API configurable. Until then, we limit to 1
                 self._message_repository,
-                has_bulk_parent=False,  # FIXME work would need to be done here in order to detect if a stream as a parent stream that is bulk
+                has_bulk_parent=False,
+                # FIXME work would need to be done here in order to detect if a stream as a parent stream that is bulk
             ),
-            record_selector=record_selector,
             stream_slicer=stream_slicer,
+            config=config,
+            parameters=model.parameters or {},
+        )
+
+        return AsyncRetriever(
+            record_selector=record_selector,
+            stream_slicer=async_job_partition_router,
             config=config,
             parameters=model.parameters or {},
         )
