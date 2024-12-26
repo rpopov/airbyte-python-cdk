@@ -91,14 +91,16 @@ class RecordSelector(HttpSelector):
         """
         all_data: Iterable[Mapping[str, Any]] = self.extractor.extract_records(response)
 
-        response_root_iterator = self.response_root_extractor.extract_records(response)
-        stream_state.update({STREAM_SLICE_RESPONSE_ROOT_KEY: next(iter(response_root_iterator), None)})
-        try:
-            yield from self.filter_and_transform(
-                all_data, stream_state, records_schema, stream_slice, next_page_token
-            )
-        finally:
-            stream_state.pop(STREAM_SLICE_RESPONSE_ROOT_KEY)
+        response_root_iterator = iter(self.response_root_extractor.extract_records(response))
+
+        enhanced_stream_state = {k: v for k, v in stream_state.items()}
+        enhanced_stream_state.update(
+            {STREAM_SLICE_RESPONSE_ROOT_KEY: next(response_root_iterator, None)}
+        )
+
+        yield from self.filter_and_transform(
+            all_data, enhanced_stream_state, records_schema, stream_slice, next_page_token
+        )
 
     def filter_and_transform(
         self,
