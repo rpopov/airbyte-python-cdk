@@ -92,7 +92,7 @@ class RecordSelector(HttpSelector):
         all_data: Iterable[Mapping[str, Any]] = self.extractor.extract_records(response)
 
         response_root_iterator = self.response_root_extractor.extract_records(response)
-        stream_state.update({STREAM_SLICE_RESPONSE_ROOT_KEY: next(response_root_iterator, None)})
+        stream_state.update({STREAM_SLICE_RESPONSE_ROOT_KEY: next(iter(response_root_iterator), None)})
         try:
             yield from self.filter_and_transform(
                 all_data, stream_state, records_schema, stream_slice, next_page_token
