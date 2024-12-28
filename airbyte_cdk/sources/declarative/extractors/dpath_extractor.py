@@ -13,6 +13,8 @@ from airbyte_cdk.sources.declarative.extractors.record_extractor import RecordEx
 from airbyte_cdk.sources.declarative.interpolation.interpolated_string import InterpolatedString
 from airbyte_cdk.sources.types import Config
 
+# The name of the service field to bind the response (root) in each record
+RESPONSE_ROOT_KEY = "$response"
 
 @dataclass
 class DpathExtractor(RecordExtractor):
@@ -52,7 +54,6 @@ class DpathExtractor(RecordExtractor):
         config (Config): The user-provided configuration as specified by the source's spec
         decoder (Decoder): The decoder responsible to transfom the response in a Mapping
     """
-
     field_path: List[Union[InterpolatedString, str]]
     config: Config
     parameters: InitVar[Mapping[str, Any]]
@@ -70,6 +71,7 @@ class DpathExtractor(RecordExtractor):
 
     def extract_records(self, response: requests.Response) -> Iterable[MutableMapping[Any, Any]]:
         for body in self.decoder.decode(response):
+            root_response = body
             if len(self._field_path) == 0:
                 extracted = body
             else:
@@ -79,7 +81,14 @@ class DpathExtractor(RecordExtractor):
                 else:
                     extracted = dpath.get(body, path, default=[])  # type: ignore # extracted will be a MutableMapping, given input data structure
             if isinstance(extracted, list):
-                yield from extracted
+                for record in extracted:
+                    copy = {k: v for k, v in record.items()}
+                    copy.update({RESPONSE_ROOT_KEY: root_response})
+                    yield copy
+            elif isinstance(extracted, dict):
+                copy = {k: v for k, v in extracted.items()}
+                copy.update({RESPONSE_ROOT_KEY: root_response})
+                yield copy
             elif extracted:
                 yield extracted
             else:

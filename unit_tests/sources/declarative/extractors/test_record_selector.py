@@ -74,6 +74,19 @@ from airbyte_cdk.sources.utils.transform import TransformConfig, TypeTransformer
             [],
             [],
         ),
+        (
+            "test_the original response is available in filters and transformations",
+            ["data"],
+            "{{ record['created_at'] == record.['$response'].data[1].created_at }}",
+            {
+                "data": [
+                    {"id": 1, "created_at": "06-06-21"},
+                    {"id": 2, "created_at": "06-07-21"},
+                    {"id": 3, "created_at": "06-08-21"},
+                ]
+            },
+            [{"id": 2, "created_at": "06-07-21"}],
+        ),
     ],
 )
 def test_record_filter(test_name, field_path, filter_template, body, expected_data):
