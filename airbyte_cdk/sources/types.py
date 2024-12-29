@@ -37,6 +37,9 @@ class Record(Mapping[str, Any]):
     def associated_slice(self) -> Optional[StreamSlice]:
         return self._associated_slice
 
+    def clone(self, *except_keys) -> Record:
+        return Record({k:v for k,v in self.data.items() if k not in except_keys},self.stream_name, self.associated_slice, self.is_file_transfer_message)
+
     def __repr__(self) -> str:
         return repr(self._data)
 
