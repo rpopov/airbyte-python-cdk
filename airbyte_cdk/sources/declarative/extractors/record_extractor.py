@@ -25,3 +25,11 @@ class RecordExtractor:
         :return: List of Records extracted from the response
         """
         pass
+
+    def strip_service_keys(self, record: Mapping[str, Any], validate=False) -> Mapping[str, Any]:
+        """
+        Remove the bindings of the service keys (like RESPONSE_ROOT_KEY) from the record.
+        If validate is True, then make sure (assert) that the service keys existed in the record.
+        Used mostly in the tests and validations.
+        """
+        return record

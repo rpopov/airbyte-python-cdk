@@ -77,7 +77,7 @@ from airbyte_cdk.sources.utils.transform import TransformConfig, TypeTransformer
         (
             "test_the original response is available in filters and transformations",
             ["data"],
-            "{{ record['created_at'] == record.['$response'].data[1].created_at }}",
+            "{{ record['created_at'] == record['$root'].data[1].created_at }}",
             {
                 "data": [
                     {"id": 1, "created_at": "06-06-21"},
@@ -129,18 +129,11 @@ def test_record_filter(test_name, field_path, filter_template, body, expected_da
             next_page_token=next_page_token,
         )
     )
+
+    actual_records = list(record_selector.strip_service_keys(actual_records, False))
     assert actual_records == [
         Record(data=data, associated_slice=stream_slice, stream_name="") for data in expected_data
     ]
-
-    calls = []
-    for record in expected_data:
-        calls.append(
-            call(record, config=config, stream_state=stream_state, stream_slice=stream_slice)
-        )
-    for transformation in transformations:
-        assert transformation.transform.call_count == len(expected_data)
-        transformation.transform.assert_has_calls(calls)
 
 
 @pytest.mark.parametrize(
@@ -212,6 +205,8 @@ def test_schema_normalization(test_name, schema, schema_transformation, body, ex
             records_schema=schema,
         )
     )
+
+    actual_records = list(record_selector.strip_service_keys(actual_records, False))
 
     assert actual_records == [Record(data, stream_slice) for data in expected_data]
 

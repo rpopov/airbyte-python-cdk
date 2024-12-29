@@ -7,7 +7,6 @@ from typing import Any, Iterable, List, Mapping, Optional, Union
 
 import requests
 
-from airbyte_cdk.sources.declarative.extractors.dpath_extractor import RESPONSE_ROOT_KEY
 from airbyte_cdk.sources.declarative.extractors.http_selector import HttpSelector
 from airbyte_cdk.sources.declarative.extractors.record_extractor import RecordExtractor
 from airbyte_cdk.sources.declarative.extractors.record_filter import RecordFilter
@@ -164,7 +163,6 @@ class RecordSelector(HttpSelector):
         If validate is True, then make sure (assert) that the service keys existed in each Record.
         Used mostly in the tests and validations.
         """
-        for actual_record in records:
-            if validate:
-              assert actual_record[RESPONSE_ROOT_KEY]
-            yield actual_record.clone(RESPONSE_ROOT_KEY)
+        for record in records:
+            data = self.extractor.strip_service_keys(record, validate)
+            yield Record(data=data, stream_name=self.name, associated_slice=record.associated_slice)

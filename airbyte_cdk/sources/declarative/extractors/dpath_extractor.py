@@ -14,7 +14,7 @@ from airbyte_cdk.sources.declarative.interpolation.interpolated_string import In
 from airbyte_cdk.sources.types import Config
 
 # The name of the service field to bind the response (root) in each record
-RESPONSE_ROOT_KEY = "$response"
+RECORD_ROOT_KEY = "$root"
 
 @dataclass
 class DpathExtractor(RecordExtractor):
@@ -82,14 +82,25 @@ class DpathExtractor(RecordExtractor):
                     extracted = dpath.get(body, path, default=[])  # type: ignore # extracted will be a MutableMapping, given input data structure
             if isinstance(extracted, list):
                 for record in extracted:
-                    copy = {k: v for k, v in record.items()}
-                    copy.update({RESPONSE_ROOT_KEY: root_response})
-                    yield copy
+                    record.update({RECORD_ROOT_KEY: root_response})
+                    yield record
             elif isinstance(extracted, dict):
-                copy = {k: v for k, v in extracted.items()}
-                copy.update({RESPONSE_ROOT_KEY: root_response})
+                copy = dict(extracted)
+                copy.update({RECORD_ROOT_KEY: root_response})
                 yield copy
             elif extracted:
                 yield extracted
             else:
                 yield from []
+
+    def strip_service_keys(self, record:MutableMapping[Any, Any], validate=False) -> MutableMapping[Any, Any]:
+        """
+        Remove the bindings of the service keys (like RECORD_ROOT_KEY) from the record.
+        If validate is True, then make sure (assert) that the service keys existed in the record.
+        """
+        if validate:
+            assert record[RECORD_ROOT_KEY] is not None, "Expected RECORD_ROOT_KEY service key"
+        result = dict(record)
+        result.pop(RECORD_ROOT_KEY)
+        return result
+

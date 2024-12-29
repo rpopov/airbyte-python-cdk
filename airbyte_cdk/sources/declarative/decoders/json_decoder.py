@@ -42,18 +42,16 @@ class JsonDecoder(Decoder):
             logger.debug(
                 "Response to parse: %s", ex.doc, exc_info=True, stack_info=True
             )
-            yield {}
+            yield from []
 
     @staticmethod
     def parse_body_json(
         body_json: MutableMapping[str, Any] | List[MutableMapping[str, Any]],
     ) -> Generator[MutableMapping[str, Any], None, None]:
-        if not isinstance(body_json, list):
-            body_json = [body_json]
-        if len(body_json) == 0:
-            yield {}
-        else:
+        if isinstance(body_json, list):
             yield from body_json
+        else:
+            yield from [body_json]
 
 
 @dataclass
