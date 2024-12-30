@@ -42,6 +42,26 @@ from airbyte_cdk.sources.utils.transform import TransformConfig, TypeTransformer
             [{"id": 1, "created_at": "06-06-21"}, {"id": 2, "created_at": "06-07-21"}],
         ),
         (
+                "test_no_record_filter_returns_all_records_with_nested",
+                ["data"],
+                None,
+                {"data": [
+                    {"id": 1, "created_at": "06-06-21", "nested":[{"id":1}]},
+                    {"id": 2, "created_at": "06-07-21", "nested":[{"id":1, "id2":2}]}]},
+                [{"id": 1, "created_at": "06-06-21", "nested":[{"id":1}]},
+                 {"id": 2, "created_at": "06-07-21", "nested":[{"id":1, "id2":2}]}]
+        ),
+        (
+                "test_true_record_filter_returns_all_records_with_nested",
+                ["data"],
+                "{{True}}",
+                {"data": [
+                    {"id": 1, "created_at": "06-06-21", "nested": [{"id": 1}]},
+                    {"id": 2, "created_at": "06-07-21", "nested": [{"id": 1, "id2": 2}]}]},
+                [{"id": 1, "created_at": "06-06-21", "nested": [{"id": 1}]},
+                 {"id": 2, "created_at": "06-07-21", "nested": [{"id": 1, "id2": 2}]}]
+        ),
+        (
             "test_with_extractor_and_filter_with_parameters",
             ["{{ parameters['parameters_field'] }}"],
             "{{ record['created_at'] > parameters['created_at'] }}",

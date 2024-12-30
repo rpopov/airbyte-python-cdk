@@ -4,6 +4,7 @@
 
 import pytest
 
+from airbyte_cdk.sources.declarative.extractors.record_extractor import SERVICE_KEY_PREFIX
 from airbyte_cdk.sources.declarative.transformations.flatten_fields import (
     FlattenFields,
 )
@@ -45,6 +46,14 @@ from airbyte_cdk.sources.declarative.transformations.flatten_fields import (
         (
             {"List": ["Item1", "Item2", "Item3"]},
             {"List.0": "Item1", "List.1": "Item2", "List.2": "Item3"},
+        ),
+        (
+                {SERVICE_KEY_PREFIX+"name":"xyz", "List": ["Item1", "Item2", "Item3"]},
+                {SERVICE_KEY_PREFIX+"name":"xyz", "List.0": "Item1", "List.1": "Item2", "List.2": "Item3"},
+        ),
+        (
+                {SERVICE_KEY_PREFIX + "name": {"k","xyz"}, "List": ["Item1", "Item2", "Item3"]},
+                {SERVICE_KEY_PREFIX + "name": {"k","xyz"}, "List.0": "Item1", "List.1": "Item2", "List.2": "Item3"},
         ),
     ],
 )

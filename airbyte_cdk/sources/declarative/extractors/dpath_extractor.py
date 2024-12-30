@@ -9,12 +9,22 @@ import dpath
 import requests
 
 from airbyte_cdk.sources.declarative.decoders import Decoder, JsonDecoder
-from airbyte_cdk.sources.declarative.extractors.record_extractor import RecordExtractor
+from airbyte_cdk.sources.declarative.extractors.record_extractor import RecordExtractor, SERVICE_KEY_PREFIX
 from airbyte_cdk.sources.declarative.interpolation.interpolated_string import InterpolatedString
 from airbyte_cdk.sources.types import Config
 
 # The name of the service field to bind the response (root) in each record
-RECORD_ROOT_KEY = "$root"
+RECORD_ROOT_KEY = SERVICE_KEY_PREFIX+"root"
+
+
+def update_record(record: Any, root:Any) -> Any:
+    if isinstance(record, dict):
+        copy = {k: v for k, v in record.items()}
+        copy.update({RECORD_ROOT_KEY: root})
+    else:
+        copy = record
+    return copy
+
 
 @dataclass
 class DpathExtractor(RecordExtractor):
@@ -82,12 +92,9 @@ class DpathExtractor(RecordExtractor):
                     extracted = dpath.get(body, path, default=[])  # type: ignore # extracted will be a MutableMapping, given input data structure
             if isinstance(extracted, list):
                 for record in extracted:
-                    record.update({RECORD_ROOT_KEY: root_response})
-                    yield record
+                    yield update_record(record, root_response)
             elif isinstance(extracted, dict):
-                copy = dict(extracted)
-                copy.update({RECORD_ROOT_KEY: root_response})
-                yield copy
+                yield update_record(extracted, root_response)
             elif extracted:
                 yield extracted
             else:

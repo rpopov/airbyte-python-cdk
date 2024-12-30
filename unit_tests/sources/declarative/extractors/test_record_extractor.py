@@ -3,7 +3,8 @@
 #
 import pytest
 from typing import Mapping
-from airbyte_cdk.sources.declarative.extractors.record_extractor import remove_service_keys, verify_service_keys_exist, SERVICE_KEY_PREFIX
+from airbyte_cdk.sources.declarative.extractors.record_extractor import remove_service_keys, verify_service_keys_exist, \
+    SERVICE_KEY_PREFIX, is_service_key
 
 
 @pytest.mark.parametrize(
@@ -47,3 +48,9 @@ def test_verify_no_service_keys(original: Mapping):
         success = True
 
     assert success, "Expected no service keys were found"
+
+def test_service_field():
+    assert is_service_key(SERVICE_KEY_PREFIX+"name")
+
+def test_regular_field():
+    assert not is_service_key("name")

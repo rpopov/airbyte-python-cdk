@@ -15,7 +15,10 @@ import requests
 SERVICE_KEY_PREFIX = "$"
 
 def remove_service_keys(mapping:Mapping[str, Any]) -> Mapping[str, Any]:
-    return {k:v for k,v in mapping.items() if k.find(SERVICE_KEY_PREFIX) != 0 }
+    return {k:v for k,v in mapping.items() if not is_service_key(k)}
+
+def is_service_key(k:str):
+    return k.find(SERVICE_KEY_PREFIX) == 0
 
 def verify_service_keys_exist(mapping:Mapping[str, Any]):
     assert mapping != remove_service_keys(mapping), "Expected service are present"
