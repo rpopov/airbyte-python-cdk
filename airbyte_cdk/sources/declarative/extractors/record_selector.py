@@ -157,12 +157,12 @@ class RecordSelector(HttpSelector):
                 )
             yield record
 
-    def strip_service_keys(self, records:Iterable[Record], validate=False) -> Iterable[Record]:
+    def remove_service_keys(self, records:Iterable[Record], validate=False) -> Iterable[Record]:
         """
         Remove the bindings of the service keys (like RESPONSE_ROOT_KEY) from the Records in records.
         If validate is True, then make sure (assert) that the service keys existed in each Record.
         Used mostly in the tests and validations.
         """
         for record in records:
-            data = self.extractor.strip_service_keys(record, validate)
+            data = self.extractor.remove_service_keys(record, validate)
             yield Record(data=data, stream_name=self.name, associated_slice=record.associated_slice)

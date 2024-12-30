@@ -93,7 +93,7 @@ class DpathExtractor(RecordExtractor):
             else:
                 yield from []
 
-    def strip_service_keys(self, record:MutableMapping[Any, Any], validate=False) -> MutableMapping[Any, Any]:
+    def remove_service_keys(self, record:MutableMapping[Any, Any], validate=False) -> MutableMapping[Any, Any]:
         """
         Remove the bindings of the service keys (like RECORD_ROOT_KEY) from the record.
         If validate is True, then make sure (assert) that the service keys existed in the record.

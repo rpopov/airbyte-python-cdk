@@ -26,7 +26,7 @@ class RecordExtractor:
         """
         pass
 
-    def strip_service_keys(self, record: Mapping[str, Any], validate=False) -> Mapping[str, Any]:
+    def remove_service_keys(self, record: Mapping[str, Any], validate=False) -> Mapping[str, Any]:
         """
         Remove the bindings of the service keys (like RESPONSE_ROOT_KEY) from the record.
         If validate is True, then make sure (assert) that the service keys existed in the record.

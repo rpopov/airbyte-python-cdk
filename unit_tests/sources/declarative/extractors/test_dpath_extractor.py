@@ -133,6 +133,6 @@ def test_dpath_extractor(field_path: List, decoder: Decoder, body, expected_reco
     response = create_response(body)
     actual_records = list(extractor.extract_records(response))
 
-    actual_records = [extractor.strip_service_keys(record, True) for record in actual_records]
+    actual_records = [extractor.remove_service_keys(record, True) for record in actual_records]
 
     assert actual_records == expected_records
