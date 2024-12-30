@@ -30,6 +30,7 @@ from airbyte_cdk.models import (
 from airbyte_cdk.sources.declarative.declarative_stream import DeclarativeStream
 from airbyte_cdk.sources.declarative.manifest_declarative_source import ManifestDeclarativeSource
 from airbyte_cdk.sources.declarative.retrievers.simple_retriever import SimpleRetriever
+from airbyte_cdk.sources.declarative.extractors.record_extractor import remove_service_keys, verify_service_keys_exist, SERVICE_KEY_PREFIX
 
 logger = logging.getLogger("airbyte")
 
@@ -1759,7 +1760,7 @@ def test_read_manifest_declarative_source(
     _stream_name = "Rates"
     with patch.object(SimpleRetriever, "_fetch_next_page", side_effect=pages) as mock_retriever:
         output_data = [
-            message.record.data for message in _run_read(manifest, _stream_name) if message.record
+           remove_service_keys(message.record.data) for message in _run_read(manifest, _stream_name) if message.record
         ]
 
         assert output_data == expected_records

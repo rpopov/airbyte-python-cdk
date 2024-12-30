@@ -8,6 +8,18 @@ from typing import Any, Iterable, Mapping
 import requests
 
 
+# Convention:
+# - The record extractors may leave service fields in the extracted records (mappings)
+# - The names (keys) of the service fields have the value of SERVICE_KEY_PREFIX as their prefix
+# - The service fields may be skipped only to ease the testing
+SERVICE_KEY_PREFIX = "$"
+
+def remove_service_keys(mapping:Mapping[str, Any]) -> Mapping[str, Any]:
+    return {k:v for k,v in mapping.items() if k.find(SERVICE_KEY_PREFIX) != 0 }
+
+def verify_service_keys_exist(mapping:Mapping[str, Any]):
+    assert mapping != remove_service_keys(mapping), "Expected service are present"
+
 @dataclass
 class RecordExtractor:
     """
@@ -26,10 +38,3 @@ class RecordExtractor:
         """
         pass
 
-    def remove_service_keys(self, record: Mapping[str, Any], validate=False) -> Mapping[str, Any]:
-        """
-        Remove the bindings of the service keys (like RESPONSE_ROOT_KEY) from the record.
-        If validate is True, then make sure (assert) that the service keys existed in the record.
-        Used mostly in the tests and validations.
-        """
-        return record

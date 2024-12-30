@@ -10,6 +10,7 @@ import requests
 
 from airbyte_cdk.sources.declarative.decoders.json_decoder import JsonDecoder
 from airbyte_cdk.sources.declarative.extractors.dpath_extractor import DpathExtractor
+from airbyte_cdk.sources.declarative.extractors.record_extractor import remove_service_keys, verify_service_keys_exist
 from airbyte_cdk.sources.declarative.extractors.record_filter import RecordFilter
 from airbyte_cdk.sources.declarative.extractors.record_selector import RecordSelector
 from airbyte_cdk.sources.declarative.transformations import RecordTransformation
@@ -130,10 +131,8 @@ def test_record_filter(test_name, field_path, filter_template, body, expected_da
         )
     )
 
-    actual_records = list(record_selector.remove_service_keys(actual_records, False))
-    assert actual_records == [
-        Record(data=data, associated_slice=stream_slice, stream_name="") for data in expected_data
-    ]
+    actual_records = [remove_service_keys(record) for record in actual_records]
+    assert actual_records == expected_data
 
 
 @pytest.mark.parametrize(
@@ -206,9 +205,9 @@ def test_schema_normalization(test_name, schema, schema_transformation, body, ex
         )
     )
 
-    actual_records = list(record_selector.remove_service_keys(actual_records, False))
+    actual_records = [remove_service_keys(record) for record in actual_records]
 
-    assert actual_records == [Record(data, stream_slice) for data in expected_data]
+    assert actual_records == expected_data
 
 
 def create_response(body):
