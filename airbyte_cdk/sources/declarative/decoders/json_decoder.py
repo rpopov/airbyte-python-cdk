@@ -36,12 +36,8 @@ class JsonDecoder(Decoder):
             body_json = response.json()
             yield from self.parse_body_json(body_json)
         except requests.exceptions.JSONDecodeError as ex:
-            logger.warning(
-                f"Response cannot be parsed into json: {ex}"
-            )
-            logger.debug(
-                "Response to parse: %s", ex.doc, exc_info=True, stack_info=True
-            )
+            logger.warning("Response cannot be parsed into json: %s", ex)
+            logger.debug("Response to parse: %s", response.text, exc_info=True, stack_info=True)
             yield from []
 
     @staticmethod

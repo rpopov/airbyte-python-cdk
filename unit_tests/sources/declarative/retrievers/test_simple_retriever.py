@@ -11,8 +11,6 @@ import requests
 from airbyte_cdk import YamlDeclarativeSource
 from airbyte_cdk.models import AirbyteLogMessage, AirbyteMessage, Level, SyncMode, Type
 from airbyte_cdk.sources.declarative.auth.declarative_authenticator import NoAuth
-from airbyte_cdk.sources.declarative.extractors.record_extractor import verify_service_keys_exist, exclude_service_keys, \
-    remove_service_keys
 from airbyte_cdk.sources.declarative.incremental import (
     DatetimeBasedCursor,
     DeclarativeCursor,
@@ -234,10 +232,6 @@ def test_simple_retriever_resumable_full_refresh_cursor_page_increment(
         r for r in retriever.read_records(records_schema={}, stream_slice=stream_slice)
     ]
 
-    for record in actual_records:
-        verify_service_keys_exist(record)
-        remove_service_keys(record.data)
-
     assert len(actual_records) == 5
     assert actual_records == expected_records[:5]
     assert retriever.state == {"next_page_token": expected_next_page}
@@ -245,10 +239,6 @@ def test_simple_retriever_resumable_full_refresh_cursor_page_increment(
     actual_records = [
         r for r in retriever.read_records(records_schema={}, stream_slice=stream_slice)
     ]
-
-    for record in actual_records:
-        verify_service_keys_exist(record)
-        remove_service_keys(record.data)
 
     assert len(actual_records) == 3
     assert actual_records == expected_records[5:]
@@ -353,10 +343,6 @@ primary_key: []
         r for r in stream.retriever.read_records(records_schema={}, stream_slice=stream_slice)
     ]
 
-    for record in actual_records:
-        verify_service_keys_exist(record)
-        remove_service_keys(record.data)
-
     assert len(actual_records) == 5
     assert actual_records == expected_records[:5]
     assert stream.retriever.state == {
@@ -371,10 +357,6 @@ primary_key: []
     actual_records = [
         r for r in stream.retriever.read_records(records_schema={}, stream_slice=stream_slice)
     ]
-
-    for record in actual_records:
-        verify_service_keys_exist(record)
-        remove_service_keys(record.data)
 
     assert len(actual_records) == 3
     assert actual_records == expected_records[5:]

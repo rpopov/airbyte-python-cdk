@@ -14,19 +14,24 @@ import requests
 # - The service fields may be skipped only to ease the testing
 SERVICE_KEY_PREFIX = "$"
 
-def exclude_service_keys(mapping:Mapping[str, Any]) -> Mapping[str, Any]:
-    return {k:v for k,v in mapping.items() if not is_service_key(k)}
 
-def remove_service_keys(mapping:dict[str, Any]):
+def exclude_service_keys(mapping: Mapping[str, Any]) -> Mapping[str, Any]:
+    return {k: v for k, v in mapping.items() if not is_service_key(k)}
+
+
+def remove_service_keys(mapping: dict[str, Any]):
     for key in list(mapping.keys()):
         if is_service_key(key):
             mapping.pop(key)
 
-def is_service_key(k:str):
+
+def is_service_key(k: str) -> bool:
     return k.find(SERVICE_KEY_PREFIX) == 0
 
-def verify_service_keys_exist(mapping:Mapping[str, Any]):
+
+def verify_service_keys_exist(mapping: Mapping[str, Any]):
     assert mapping != exclude_service_keys(mapping), "Expected service are present"
+
 
 @dataclass
 class RecordExtractor:
@@ -45,4 +50,3 @@ class RecordExtractor:
         :return: List of Records extracted from the response
         """
         pass
-
