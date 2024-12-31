@@ -10,7 +10,10 @@ import requests
 
 from airbyte_cdk.sources.declarative.decoders.json_decoder import JsonDecoder
 from airbyte_cdk.sources.declarative.extractors.dpath_extractor import DpathExtractor
-from airbyte_cdk.sources.declarative.extractors.record_extractor import exclude_service_keys, verify_service_keys_exist
+from airbyte_cdk.sources.declarative.extractors.record_extractor import (
+    exclude_service_keys,
+    verify_service_keys_exist,
+)
 from airbyte_cdk.sources.declarative.extractors.record_filter import RecordFilter
 from airbyte_cdk.sources.declarative.extractors.record_selector import RecordSelector
 from airbyte_cdk.sources.declarative.transformations import RecordTransformation
@@ -42,24 +45,34 @@ from airbyte_cdk.sources.utils.transform import TransformConfig, TypeTransformer
             [{"id": 1, "created_at": "06-06-21"}, {"id": 2, "created_at": "06-07-21"}],
         ),
         (
-                "test_no_record_filter_returns_all_records_with_nested",
-                ["data"],
-                None,
-                {"data": [
-                    {"id": 1, "created_at": "06-06-21", "nested":[{"id":1}]},
-                    {"id": 2, "created_at": "06-07-21", "nested":[{"id":1, "id2":2}]}]},
-                [{"id": 1, "created_at": "06-06-21", "nested":[{"id":1}]},
-                 {"id": 2, "created_at": "06-07-21", "nested":[{"id":1, "id2":2}]}]
+            "test_no_record_filter_returns_all_records_with_nested",
+            ["data"],
+            None,
+            {
+                "data": [
+                    {"id": 1, "created_at": "06-06-21", "nested": [{"id": 1}]},
+                    {"id": 2, "created_at": "06-07-21", "nested": [{"id": 1, "id2": 2}]},
+                ]
+            },
+            [
+                {"id": 1, "created_at": "06-06-21", "nested": [{"id": 1}]},
+                {"id": 2, "created_at": "06-07-21", "nested": [{"id": 1, "id2": 2}]},
+            ],
         ),
         (
-                "test_true_record_filter_returns_all_records_with_nested",
-                ["data"],
-                "{{True}}",
-                {"data": [
+            "test_true_record_filter_returns_all_records_with_nested",
+            ["data"],
+            "{{True}}",
+            {
+                "data": [
                     {"id": 1, "created_at": "06-06-21", "nested": [{"id": 1}]},
-                    {"id": 2, "created_at": "06-07-21", "nested": [{"id": 1, "id2": 2}]}]},
-                [{"id": 1, "created_at": "06-06-21", "nested": [{"id": 1}]},
-                 {"id": 2, "created_at": "06-07-21", "nested": [{"id": 1, "id2": 2}]}]
+                    {"id": 2, "created_at": "06-07-21", "nested": [{"id": 1, "id2": 2}]},
+                ]
+            },
+            [
+                {"id": 1, "created_at": "06-06-21", "nested": [{"id": 1}]},
+                {"id": 2, "created_at": "06-07-21", "nested": [{"id": 1, "id2": 2}]},
+            ],
         ),
         (
             "test_with_extractor_and_filter_with_parameters",

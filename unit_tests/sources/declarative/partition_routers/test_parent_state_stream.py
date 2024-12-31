@@ -257,6 +257,7 @@ def _run_read(
     logger = MagicMock()
     return list(source.read(logger, config, catalog, state))
 
+
 def run_incremental_parent_state_test(
     manifest, mock_requests, expected_records, initial_state, expected_states
 ):

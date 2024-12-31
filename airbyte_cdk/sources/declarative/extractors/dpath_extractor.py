@@ -9,15 +9,18 @@ import dpath
 import requests
 
 from airbyte_cdk.sources.declarative.decoders import Decoder, JsonDecoder
-from airbyte_cdk.sources.declarative.extractors.record_extractor import RecordExtractor, SERVICE_KEY_PREFIX
+from airbyte_cdk.sources.declarative.extractors.record_extractor import (
+    RecordExtractor,
+    SERVICE_KEY_PREFIX,
+)
 from airbyte_cdk.sources.declarative.interpolation.interpolated_string import InterpolatedString
 from airbyte_cdk.sources.types import Config
 
 # The name of the service field to bind the response (root) in each record
-RECORD_ROOT_KEY = SERVICE_KEY_PREFIX+"root"
+RECORD_ROOT_KEY = SERVICE_KEY_PREFIX + "root"
 
 
-def update_record(record: Any, root:Any) -> Any:
+def update_record(record: Any, root: Any) -> Any:
     if isinstance(record, dict):
         copy = {k: v for k, v in record.items()}
         copy.update({RECORD_ROOT_KEY: root})
@@ -64,6 +67,7 @@ class DpathExtractor(RecordExtractor):
         config (Config): The user-provided configuration as specified by the source's spec
         decoder (Decoder): The decoder responsible to transfom the response in a Mapping
     """
+
     field_path: List[Union[InterpolatedString, str]]
     config: Config
     parameters: InitVar[Mapping[str, Any]]
@@ -99,4 +103,3 @@ class DpathExtractor(RecordExtractor):
                 yield extracted
             else:
                 yield from []
-

@@ -8,7 +8,10 @@ from typing import Any, Iterable, List, Mapping, Optional, Union
 import requests
 
 from airbyte_cdk.sources.declarative.extractors.http_selector import HttpSelector
-from airbyte_cdk.sources.declarative.extractors.record_extractor import RecordExtractor, exclude_service_keys
+from airbyte_cdk.sources.declarative.extractors.record_extractor import (
+    RecordExtractor,
+    exclude_service_keys,
+)
 from airbyte_cdk.sources.declarative.extractors.record_filter import RecordFilter
 from airbyte_cdk.sources.declarative.interpolation import InterpolatedString
 from airbyte_cdk.sources.declarative.models import SchemaNormalization
@@ -158,8 +161,9 @@ class RecordSelector(HttpSelector):
                 )
             yield record
 
-    def _remove_service_keys(self, records: Iterable[Mapping[str, Any]]) -> Iterable[Mapping[str, Any]]:
+    def _remove_service_keys(
+        self, records: Iterable[Mapping[str, Any]]
+    ) -> Iterable[Mapping[str, Any]]:
         for record in records:
             clean_record = exclude_service_keys(record)
             yield clean_record
-

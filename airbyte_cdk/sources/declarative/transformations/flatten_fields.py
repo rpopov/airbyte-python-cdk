@@ -40,7 +40,7 @@ class FlattenFields(RecordTransformation):
                             else current_key
                         )
                         stack.append((value, new_key))
-                    else: # transfer the service fields without change
+                    else:  # transfer the service fields without change
                         transformed_record[current_key] = value
 
             elif isinstance(current_record, list):

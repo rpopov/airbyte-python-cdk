@@ -48,12 +48,22 @@ from airbyte_cdk.sources.declarative.transformations.flatten_fields import (
             {"List.0": "Item1", "List.1": "Item2", "List.2": "Item3"},
         ),
         (
-                {SERVICE_KEY_PREFIX+"name":"xyz", "List": ["Item1", "Item2", "Item3"]},
-                {SERVICE_KEY_PREFIX+"name":"xyz", "List.0": "Item1", "List.1": "Item2", "List.2": "Item3"},
+            {SERVICE_KEY_PREFIX + "name": "xyz", "List": ["Item1", "Item2", "Item3"]},
+            {
+                SERVICE_KEY_PREFIX + "name": "xyz",
+                "List.0": "Item1",
+                "List.1": "Item2",
+                "List.2": "Item3",
+            },
         ),
         (
-                {SERVICE_KEY_PREFIX + "name": {"k","xyz"}, "List": ["Item1", "Item2", "Item3"]},
-                {SERVICE_KEY_PREFIX + "name": {"k","xyz"}, "List.0": "Item1", "List.1": "Item2", "List.2": "Item3"},
+            {SERVICE_KEY_PREFIX + "name": {"k", "xyz"}, "List": ["Item1", "Item2", "Item3"]},
+            {
+                SERVICE_KEY_PREFIX + "name": {"k", "xyz"},
+                "List.0": "Item1",
+                "List.1": "Item2",
+                "List.2": "Item3",
+            },
         ),
     ],
 )

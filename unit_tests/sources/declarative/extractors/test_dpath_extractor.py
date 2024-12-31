@@ -15,7 +15,10 @@ from airbyte_cdk.sources.declarative.decoders.json_decoder import (
     JsonlDecoder,
 )
 from airbyte_cdk.sources.declarative.extractors.dpath_extractor import DpathExtractor
-from airbyte_cdk.sources.declarative.extractors.record_extractor import exclude_service_keys, verify_service_keys_exist
+from airbyte_cdk.sources.declarative.extractors.record_extractor import (
+    exclude_service_keys,
+    verify_service_keys_exist,
+)
 
 config = {"field": "record_array"}
 parameters = {"parameters_field": "record_array"}
@@ -34,24 +37,61 @@ def create_response(body: Union[Dict, bytes]):
 @pytest.mark.parametrize(
     "field_path, decoder, body, expected_records",
     [
-        ([], decoder_json, b'', []),
+        ([], decoder_json, b"", []),
         ([], decoder_json, {}, [{}]),
         ([], decoder_json, [], []),
         ([], decoder_json, {"id": 1}, [{"id": 1}]),
         ([], decoder_json, [{"id": 1}, {"id": 2}], [{"id": 1}, {"id": 2}]),
-
-        ([], decoder_json, [{"id": 1, "nested":{"id2": 2}}], [{"id": 1, "nested":{"id2": 2}}]),
-        ([], decoder_json, [{"id": 1, "nested":{"id2": 2, "id3":3}}], [{"id": 1, "nested":{"id2": 2, "id3":3}}]),
-        ([], decoder_json, [{"id": 1, "nested":{"id2": 2}},{"id": 3, "nested": {"id4": 4}}],  [{"id": 1, "nested": {"id2": 2}},{"id": 3, "nested": {"id4": 4}}]),
-        ([], decoder_json, [{"id": 1, "nested":{"id2": 2, "id3":3}},{"id": 3, "nested": {"id4": 4, "id5":5}}], [{"id": 1, "nested": {"id2": 2, "id3":3}},{"id": 3, "nested": {"id4": 4, "id5":5}}]),
-
+        ([], decoder_json, [{"id": 1, "nested": {"id2": 2}}], [{"id": 1, "nested": {"id2": 2}}]),
+        (
+            [],
+            decoder_json,
+            [{"id": 1, "nested": {"id2": 2, "id3": 3}}],
+            [{"id": 1, "nested": {"id2": 2, "id3": 3}}],
+        ),
+        (
+            [],
+            decoder_json,
+            [{"id": 1, "nested": {"id2": 2}}, {"id": 3, "nested": {"id4": 4}}],
+            [{"id": 1, "nested": {"id2": 2}}, {"id": 3, "nested": {"id4": 4}}],
+        ),
+        (
+            [],
+            decoder_json,
+            [{"id": 1, "nested": {"id2": 2, "id3": 3}}, {"id": 3, "nested": {"id4": 4, "id5": 5}}],
+            [{"id": 1, "nested": {"id2": 2, "id3": 3}}, {"id": 3, "nested": {"id4": 4, "id5": 5}}],
+        ),
         (["data"], decoder_json, {"data": {"id": 1}}, [{"id": 1}]),
         (["data"], decoder_json, {"data": [{"id": 1}, {"id": 2}]}, [{"id": 1}, {"id": 2}]),
-
-        (["data"], decoder_json, {"data":[{"id": 1, "nested":{"id2": 2}}]}, [{"id": 1, "nested":{"id2": 2}}]),
-        (["data"], decoder_json, {"data":[{"id": 1, "nested":{"id2": 2, "id3":3}}]}, [{"id": 1, "nested": {"id2": 2, "id3":3}}]),
-        (["data"], decoder_json, {"data":[{"id": 1, "nested":{"id2": 2}},{"id": 3, "nested": {"id4": 4}}]}, [{"id": 1, "nested": {"id2": 2}},{"id": 3, "nested": {"id4": 4}}]),
-        (["data"], decoder_json, {"data":[{"id": 1, "nested":{"id2": 2, "id3":3}},{"id": 3, "nested": {"id4": 4, "id5":5}}]}, [{"id": 1, "nested": {"id2": 2, "id3":3}},{"id": 3, "nested": {"id4": 4, "id5":5}}]),
+        (
+            ["data"],
+            decoder_json,
+            {"data": [{"id": 1, "nested": {"id2": 2}}]},
+            [{"id": 1, "nested": {"id2": 2}}],
+        ),
+        (
+            ["data"],
+            decoder_json,
+            {"data": [{"id": 1, "nested": {"id2": 2, "id3": 3}}]},
+            [{"id": 1, "nested": {"id2": 2, "id3": 3}}],
+        ),
+        (
+            ["data"],
+            decoder_json,
+            {"data": [{"id": 1, "nested": {"id2": 2}}, {"id": 3, "nested": {"id4": 4}}]},
+            [{"id": 1, "nested": {"id2": 2}}, {"id": 3, "nested": {"id4": 4}}],
+        ),
+        (
+            ["data"],
+            decoder_json,
+            {
+                "data": [
+                    {"id": 1, "nested": {"id2": 2, "id3": 3}},
+                    {"id": 3, "nested": {"id4": 4, "id5": 5}},
+                ]
+            },
+            [{"id": 1, "nested": {"id2": 2, "id3": 3}}, {"id": 3, "nested": {"id4": 4, "id5": 5}}],
+        ),
         (
             ["data", "records"],
             decoder_json,
@@ -83,9 +123,9 @@ def create_response(body: Union[Dict, bytes]):
             },
             [{"id": 1}, {"id": 2}, {"id": 3}, {"id": 4}],
         ),
-        ([], decoder_jsonl, b'', []),
-        ([], decoder_jsonl, [], []), # This case allows a line in JSONL to be an array or records,
-                                     # that will be inlined in the overall list of records. Same as below.
+        ([], decoder_jsonl, b"", []),
+        ([], decoder_jsonl, [], []),  # This case allows a line in JSONL to be an array or records,
+        # that will be inlined in the overall list of records. Same as below.
         ([], decoder_jsonl, {}, [{}]),
         ([], decoder_jsonl, {"id": 1}, [{"id": 1}]),
         ([], decoder_jsonl, [{"id": 1}, {"id": 2}], [{"id": 1}, {"id": 2}]),

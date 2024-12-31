@@ -45,7 +45,13 @@ def test_json_decoder(requests_mock, response_body, expected_json):
             [{"id": 1, "name": "test1"}, {"id": 2, "name": "test2"}],
         ),
     ],
-    ids=["empty_response", "empty_object_response", "empty_list_response", "one_line_json", "multi_line_json"],
+    ids=[
+        "empty_response",
+        "empty_object_response",
+        "empty_list_response",
+        "one_line_json",
+        "multi_line_json",
+    ],
 )
 def test_jsonl_decoder(requests_mock, response_body, expected_json):
     requests_mock.register_uri("GET", "https://airbyte.io/", text=response_body)
