@@ -21,6 +21,7 @@ from airbyte_cdk.models import (
     StreamDescriptor,
     SyncMode,
 )
+from airbyte_cdk.sources.declarative.extractors.record_extractor import remove_service_keys, verify_service_keys_exist
 from airbyte_cdk.sources.declarative.manifest_declarative_source import ManifestDeclarativeSource
 
 SUBSTREAM_MANIFEST: MutableMapping[str, Any] = {
@@ -290,6 +291,11 @@ def run_incremental_parent_state_test(
 
         # Run the initial read
         output = _run_read(manifest, config, _stream_name, initial_state)
+        for message in output:
+            if message.record:
+                verify_service_keys_exist(message.record.data)
+                remove_service_keys(message.record.data)
+
         output_data = [message.record.data for message in output if message.record]
 
         # Assert that output_data equals expected_records
@@ -321,6 +327,11 @@ def run_incremental_parent_state_test(
         # For each intermediate state, perform another read starting from that state
         for state, records_before_state in intermediate_states[:-1]:
             output_intermediate = _run_read(manifest, config, _stream_name, [state])
+            for message in output_intermediate:
+                if message.record:
+                    verify_service_keys_exist(message.record.data)
+                    remove_service_keys(message.record.data)
+
             records_from_state = [
                 message.record.data for message in output_intermediate if message.record
             ]
@@ -863,6 +874,11 @@ def test_incremental_parent_state_migration(
             m.get(url, json=response)
 
         output = _run_read(manifest, config, _stream_name, initial_state)
+        for message in output:
+            if message.record:
+                verify_service_keys_exist(message.record.data)
+                remove_service_keys(message.record.data)
+
         output_data = [message.record.data for message in output if message.record]
 
         assert output_data == expected_records
@@ -1061,6 +1077,11 @@ def test_incremental_parent_state_no_slices(
             m.get(url, json=response)
 
         output = _run_read(manifest, config, _stream_name, initial_state)
+        for message in output:
+            if message.record:
+                verify_service_keys_exist(message.record.data)
+                remove_service_keys(message.record.data)
+
         output_data = [message.record.data for message in output if message.record]
 
         assert output_data == expected_records
@@ -1268,6 +1289,11 @@ def test_incremental_parent_state_no_records(
             m.get(url, json=response)
 
         output = _run_read(manifest, config, _stream_name, initial_state)
+        for message in output:
+            if message.record:
+                verify_service_keys_exist(message.record.data)
+                remove_service_keys(message.record.data)
+
         output_data = [message.record.data for message in output if message.record]
 
         assert output_data == expected_records
@@ -1521,6 +1547,11 @@ def test_incremental_parent_state_no_incremental_dependency(
             m.get(url, json=response)
 
         output = _run_read(manifest, config, _stream_name, initial_state)
+        for message in output:
+            if message.record:
+                verify_service_keys_exist(message.record.data)
+                remove_service_keys(message.record.data)
+
         output_data = [message.record.data for message in output if message.record]
 
         assert output_data == expected_records

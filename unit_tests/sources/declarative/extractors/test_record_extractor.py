@@ -3,8 +3,23 @@
 #
 import pytest
 from typing import Mapping
-from airbyte_cdk.sources.declarative.extractors.record_extractor import remove_service_keys, verify_service_keys_exist, \
-    SERVICE_KEY_PREFIX, is_service_key
+from airbyte_cdk.sources.declarative.extractors.record_extractor import exclude_service_keys, verify_service_keys_exist, \
+    SERVICE_KEY_PREFIX, is_service_key, remove_service_keys
+
+
+@pytest.mark.parametrize(
+    "original, expected",
+    [
+        ({},{}),
+        ({"k":"v"},{"k":"v"}),
+        ({"k": "v", "k2": "v"}, {"k": "v", "k2": "v"}),
+        ({SERVICE_KEY_PREFIX+"k": "v"}, {}),
+        ({SERVICE_KEY_PREFIX+"k": "v","k": "v"}, {"k": "v"}),
+        ({SERVICE_KEY_PREFIX+"k": "v","k": "v", "k2": "v"}, {"k": "v", "k2": "v"})
+    ]
+)
+def test_exclude_service_keys(original: Mapping, expected: Mapping):
+    assert exclude_service_keys(original) == expected
 
 
 @pytest.mark.parametrize(
@@ -19,7 +34,9 @@ from airbyte_cdk.sources.declarative.extractors.record_extractor import remove_s
     ]
 )
 def test_remove_service_keys(original: Mapping, expected: Mapping):
-    assert remove_service_keys(original) == expected
+    remove_service_keys(original)
+    assert original == expected
+
 
 @pytest.mark.parametrize(
     "original",
