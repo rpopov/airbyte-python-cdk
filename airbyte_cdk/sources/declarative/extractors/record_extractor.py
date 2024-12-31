@@ -7,7 +7,6 @@ from typing import Any, Iterable, Mapping
 
 import requests
 
-
 # Convention:
 # - The record extractors may leave service fields in the extracted records (mappings)
 # - The names (keys) of the service fields have the value of SERVICE_KEY_PREFIX as their prefix

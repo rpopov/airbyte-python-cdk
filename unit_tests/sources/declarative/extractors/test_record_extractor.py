@@ -1,14 +1,16 @@
 #
 # Copyright (c) 2023 Airbyte, Inc., all rights reserved.
 #
-import pytest
 from typing import Mapping
+
+import pytest
+
 from airbyte_cdk.sources.declarative.extractors.record_extractor import (
-    exclude_service_keys,
-    verify_service_keys_exist,
     SERVICE_KEY_PREFIX,
+    exclude_service_keys,
     is_service_key,
     remove_service_keys,
+    verify_service_keys_exist,
 )
 
 

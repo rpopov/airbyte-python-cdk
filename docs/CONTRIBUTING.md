@@ -40,7 +40,8 @@ To see all available scripts, run `poetry run poe`.
 
 - Iterate on the CDK code locally.
 - Run `poetry run poe format-fix` to auto-fix formatting issues.
-- If you only want to format Python code (excluding markdown, yaml, etc.), you can use `poetry run ruff format` to autoformat your Python code.
+- Run `poetry run ruff format` to format your Python code.
+- Run `poetry run ruff check .` to report the not fixed issues. Fix them manually.
 
 To see all available `ruff` options, run `poetry run ruff`.
 
