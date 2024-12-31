@@ -18,7 +18,7 @@ def exclude_service_keys(mapping: Mapping[str, Any]) -> Mapping[str, Any]:
     return {k: v for k, v in mapping.items() if not is_service_key(k)}
 
 
-def remove_service_keys(mapping: dict[str, Any]):
+def remove_service_keys(mapping: dict[str, Any]):  # type: ignore[no-untyped-def]
     for key in list(mapping.keys()):
         if is_service_key(key):
             mapping.pop(key)
@@ -28,7 +28,7 @@ def is_service_key(k: str) -> bool:
     return k.find(SERVICE_KEY_PREFIX) == 0
 
 
-def verify_service_keys_exist(mapping: Mapping[str, Any]):
+def verify_service_keys_exist(mapping: Mapping[str, Any]):  # type: ignore[no-untyped-def]
     assert mapping != exclude_service_keys(mapping), "Expected service are present"
 
 

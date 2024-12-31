@@ -41,7 +41,9 @@ To see all available scripts, run `poetry run poe`.
 - Iterate on the CDK code locally.
 - Run `poetry run poe format-fix` to auto-fix formatting issues.
 - Run `poetry run ruff format` to format your Python code.
+- Run `poetry run ruff check --fix` to fix the formatting issues.
 - Run `poetry run ruff check .` to report the not fixed issues. Fix them manually.
+- Run `poetry run mypy --config-file mypy.ini airbyte_cdk` to validate the code. Resolve the reported issues.
 
 To see all available `ruff` options, run `poetry run ruff`.
 
