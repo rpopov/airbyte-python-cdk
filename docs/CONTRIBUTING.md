@@ -70,7 +70,20 @@ airbyte_cdk = { path = "../../../../airbyte-python-cdk", develop = true }
 ```
 
 * Run `poetry update` to reinstall `airbyte_cdk` from your local working directory.
-* Run the connector's tests.
+* Run the connector's tests (see the connector's README.md)
+```
+poetry run <connector name> spec
+poetry run <connector name> check --config secrets/config.json
+poetry run <connector name> discover --config secrets/config.json
+poetry run <connector name> read --config secrets/config.json --catalog integration_tests/<connector name>.json
+```
+e.g.
+```
+poetry run source-shopify spec
+poetry run source-shopify check --config secrets/config.json
+poetry run source-shopify discover --config secrets/config.json
+poetry run source-shopify read --config secrets/config.json --catalog integration_tests/configured_catalog.json
+```
 * When testing is complete, revert your test changes in the Connector.
 
 ### Option 2: Build and Test Connectors Using `airbyte-ci --use-local-cdk`
@@ -86,11 +99,11 @@ _Pre-requisite: Install the [`airbyte-ci` CLI](https://github.com/airbytehq/airb
 airbyte-ci connectors --use-local-cdk --name=<CONNECTOR> build
 ```
 
-Or use the `test` command with `--use-local-cdk` to run the full set of connector tests, including connector acceptance tests (CAT) and the connector's own unit tests:
+* Use the `test` command with `--use-local-cdk` to run the full set of connector tests, including connector acceptance tests (CAT) and the connector's own unit tests:
 
 ```bash
 # from the airbytehq/airbyte base directory
-airbyte-ci connectors --use-local-cdk --name=<CONNECTOR> build
+airbyte-ci connectors --use-local-cdk --name=<CONNECTOR> test
 ```
 
 Note that the local CDK is injected at build time, so if you make changes, you will have to run the build command again to see them reflected.
