@@ -14,8 +14,54 @@ Thank you for being interested in contributing to Airbyte Python CDK! Here are s
 Here are some tips to get started using the project dependencies and development tools:
 
 1. Clone the CDK repo. If you will be testing connectors, you should clone the CDK into the same parent directory as `airbytehq/airbyte`, which contains the connector definitions.
-1. [Install Poetry](https://python-poetry.org/docs/#).
-2. Run `poetry install --all-extras` to install the unit tests' prerequisites and [Poe the Poet](https://poethepoet.natn.io/).
+2. Make sure your Python version is 3.10 or 3.11
+Fedora 41:
+```
+sudo dnf install python3.11
+```
+2. [Install pip](https://pip.pypa.io/en/stable/installation/)
+Fedora 41:
+```
+sudo dnf install pip
+```
+3. [Install pipx](https://pipx.pypa.io/stable/installation/)
+Fedora 41:
+```
+sudo dnf install pipx
+```
+4. [Install Poetry](https://python-poetry.org/docs/#):
+```
+pipx install poetry
+```
+Fedora 41:
+```
+sudo dnf install poetry
+```
+
+5. In the **airbyte-python-cdk project** install [Poe the Poet](https://poethepoet.natn.io/) and unit tests' prerequisites:
+```
+poetry install --all-extras
+```
+
+6. If your operating system is RHEL or compatible, execute:
+```
+man iptables
+```
+See also:
+  * [Dager-Podman Integration](https://blog.playgroundtech.io/introduction-to-dagger-6ab55ee28723)
+  * [CDK Issue 197](https://github.com/airbytehq/airbyte-python-cdk/issues/197)
+
+7. Make sure Docker is installed locally, instead of Podman 
+See also:
+  * [CDK Issue 197](https://github.com/airbytehq/airbyte-python-cdk/issues/197)
+
+8. Edit airbyte/airbyte-integrations/connectors/source-shopify/acceptance-test-config.yml and change:
+```
+   connector_image: airbyte/source-shopify:dev    to    connector_image: airbyte/source-shopify:<version>
+```
+where the **version** comes from airbyte/airbyte-integrations/connectors/source-shopify/metadata.yaml, as 
+the value of the **dockerImageTag** parameter.
+
 
 ## Local development
 
@@ -49,37 +95,55 @@ To see all available scripts and options, run:
 - `poetry run poe`
 
 
-## Test CDK Changes against Connectors (integration tests)
+## Test locally CDK Changes against Connectors (integration tests)
 
 When developing a new feature in the CDK, you may find it necessary to run a connector that uses that new feature or to use an existing connector to validate a new feature or fix in the CDK. The [GitHub pipelines](.github/workflows/connector-tests.yml) in this project run such tests against the Shopify source as **integration tests**.
 
-### Option 1: Installing your local CDK into a local Python connector
-
 **Assumptions:**
-* The connector to test with is in the root [Airbyte project](https://github.com/airbytehq/airbyte).
+* The test connector is in the [Airbyte project](https://github.com/airbytehq/airbyte).
 * The [Airbyte project](https://github.com/airbytehq/airbyte) is checked out in `airbyte` directory.
-* The CDK development project is checked out in the `airbyte-python-cdk` directory - a sibling of the `airbyte` directory.
+* The [CDK development](https://github.com/airbytehq/airbyte-python-cdk) project is checked out in the `airbyte-python-cdk` directory - a sibling of the `airbyte` directory.
 
 **Preparation steps**
-* As of
-  * [Acceptance Tests Reference](https://docs.airbyte.com/connector-development/testing-connectors/connector-acceptance-tests-reference)
-  * [Connector Acceptance Tests](https://github.com/airbytehq/airbyte/blob/master/airbyte-integrations/bases/connector-acceptance-test/README.md)
-
+* In the `airbyte` project run:
 ```
-cd airbyte-integrations/bases/connector-acceptance-test/
+cd airbyte/airbyte-integrations/bases/connector-acceptance-test/
 poetry install
 ```
-
-* Change the current directory to the connector's directory, e.g.
-  `cd airbyte/airbyte-integrations/connectors/source-shopify` 
-* Edit the connector's `pyproject.toml` file
-* Replace the line with `airbyte_cdk` with the following:
-
+* Edit the `airbyte/airbyte-integrations/connectors/<test connector>/pyproject.toml` file.
+  Replace the line with `airbyte_cdk` with the following (see the assumptions above):
 ```toml
 airbyte_cdk = { path = "../../../../airbyte-python-cdk", develop = true }
 ```
-
-* Run `poetry update` to reinstall `airbyte_cdk` from your local working directory.
+* In `airbyte/airbyte-integrations/connectors/<test connector>` reinstall `airbyte_cdk` from your local working directory:
+```
+cd airbyte/airbyte-integrations/connectors/<test connector>
+poetry install
+```
+* In `airbyte/airbyte-integrations/connectors/<test connector>/` create the `secrets/config.json` file.
+  Foe example, use the Shopify connector for integration test: 
+  * Register in shopify.com as of [Shopify test connector](https://docs.airbyte.com/integrations/sources/shopify):
+  * Use the generated **Admin API Access Token** as the API **password** in the configuration file. 
+  * On the **Settings / Domains** page find the subdomain of *myshopify.com* and use it as the **shop** in the configuration file:
+    Example:
+    ```
+    domain: nw0ipt-vr.myshopify.com
+    shop: nw0ipt-vr
+    ```
+Example contents:
+```
+{
+  "shop": "nw0ipt-vr",
+  "start_date": "2020-11-01",
+  "credentials": {
+    "auth_method": "api_password",
+    "api_password": "shpat_XXXXXXXXXXX"
+  }
+}
+```
+* See also:
+  * [Acceptance Tests Reference](https://docs.airbyte.com/connector-development/testing-connectors/connector-acceptance-tests-reference)
+  * [Connector Acceptance Tests](https://github.com/airbytehq/airbyte/blob/master/airbyte-integrations/bases/connector-acceptance-test/README.md)
 
 **Steps:**
 
@@ -93,7 +157,7 @@ poetry run <connector name> discover --config secrets/config.json
 poetry run <connector name> read --config secrets/config.json --catalog integration_tests/<connector name>.json
 poetry run pytest
 ```
-e.g.
+Example:
 ```
 cd airbyte/airbyte-integrations/connectors/source-shopify
 
@@ -103,32 +167,42 @@ poetry run source-shopify discover --config secrets/config.json
 poetry run source-shopify read --config secrets/config.json --catalog integration_tests/configured_catalog.json
 poetry run pytest
 ```
-* Run the acceptance tests:
+* Run the acceptance tests locally:
 ```
 cd airbyte/airbyte-integrations/bases/connector-acceptance-test
 
-poetry run pytest -p connector_acceptance_test.plugin --acceptance-test-config=../../connectors/<connector name> --pdb
+poetry run pytest -p connector_acceptance_test.plugin --acceptance-test-config=../../connectors/<connector name>
+```
+Example:
+```
+poetry run pytest -p connector_acceptance_test.plugin --acceptance-test-config=../../connectors/source-shopify
+# or with debug option:
+poetry run pytest -p connector_acceptance_test.plugin --acceptance-test-config=../../connectors/source-shopify --pdb
+# or with timeout option:
+poetry run pytest -p connector_acceptance_test.plugin --acceptance-test-config=../../connectors/source-shopify --timeout=30
 ```
 
-* When testing is complete, revert your test changes in the Connector.
+* When testing is complete, revert your test changes.
 
-### Option 2: Build and Test Connectors Using `airbyte-ci --use-local-cdk`
+## Test CDK Changes against Connectors (in-container)
 
-_Pre-requisite: Install the [`airbyte-ci` CLI](https://github.com/airbytehq/airbyte/blob/master/airbyte-ci/connectors/pipelines/README.md)_
+**Preparation steps**
+
+* Install the [`airbyte-ci` CLI](https://github.com/airbytehq/airbyte/blob/master/airbyte-ci/connectors/pipelines/README.md)
 
 **Steps:**
 
 * Build your connector image with the local CDK using:
 
 ```bash
-# from the airbytehq/airbyte base directory
+cd airbyte
 airbyte-ci connectors --use-local-cdk --name=<CONNECTOR> build
 ```
 
 * Use the `test` command with `--use-local-cdk` to run the full set of connector tests, including connector acceptance tests (CAT) and the connector's own unit tests:
 
 ```bash
-# from the airbytehq/airbyte base directory
+cd airbyte
 airbyte-ci connectors --use-local-cdk --name=<CONNECTOR> test
 ```
 
