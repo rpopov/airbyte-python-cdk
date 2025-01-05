@@ -15,16 +15,19 @@ Here are some tips to get started using the project dependencies and development
 
 1. Clone the CDK repo. If you will be testing connectors, you should clone the CDK into the same parent directory as `airbytehq/airbyte`, which contains the connector definitions.
 2. Make sure your Python version is 3.10 or 3.11
+
 Fedora 41:
 ```
 sudo dnf install python3.11
 ```
 2. [Install pip](https://pip.pypa.io/en/stable/installation/)
+
 Fedora 41:
 ```
 sudo dnf install pip
 ```
 3. [Install pipx](https://pipx.pypa.io/stable/installation/)
+
 Fedora 41:
 ```
 sudo dnf install pipx
