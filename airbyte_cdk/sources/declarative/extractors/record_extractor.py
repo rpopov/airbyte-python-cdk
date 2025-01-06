@@ -24,12 +24,12 @@ def remove_service_keys(mapping: dict[str, Any]):  # type: ignore[no-untyped-def
             mapping.pop(key)
 
 
-def is_service_key(k: str) -> bool:
-    return k.find(SERVICE_KEY_PREFIX) == 0
+def is_service_key(key: str) -> bool:
+    return key.find(SERVICE_KEY_PREFIX) == 0
 
 
 def verify_service_keys_exist(mapping: Mapping[str, Any]):  # type: ignore[no-untyped-def]
-    assert mapping != exclude_service_keys(mapping), "Expected service are present"
+    assert mapping != exclude_service_keys(mapping), "Expected service keys are present"
 
 
 @dataclass
