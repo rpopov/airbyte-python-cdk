@@ -9,10 +9,13 @@ import pytest
 import requests
 
 from airbyte_cdk.sources.declarative.decoders.json_decoder import JsonDecoder
-from airbyte_cdk.sources.declarative.extractors.dpath_extractor import DpathExtractor
+from airbyte_cdk.sources.declarative.extractors.dpath_extractor import (
+     DpathExtractor,
+     RECORD_ROOT_KEY
+)
 from airbyte_cdk.sources.declarative.extractors.record_extractor import (
     exclude_service_keys,
-    verify_service_keys_exist,
+    assert_service_keys_exist,
 )
 from airbyte_cdk.sources.declarative.extractors.record_filter import RecordFilter
 from airbyte_cdk.sources.declarative.extractors.record_selector import RecordSelector
@@ -111,7 +114,7 @@ from airbyte_cdk.sources.utils.transform import TransformConfig, TypeTransformer
         (
             "test_the original response is available in filters and transformations",
             ["data"],
-            "{{ record['created_at'] == record['$root'].data[1].created_at }}",
+            "{{ record['created_at'] == record['"+RECORD_ROOT_KEY+"'].data[1].created_at }}",
             {
                 "data": [
                     {"id": 1, "created_at": "06-06-21"},

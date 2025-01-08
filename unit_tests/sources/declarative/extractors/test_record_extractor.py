@@ -10,7 +10,7 @@ from airbyte_cdk.sources.declarative.extractors.record_extractor import (
     exclude_service_keys,
     is_service_key,
     remove_service_keys,
-    verify_service_keys_exist,
+    assert_service_keys_exist,
 )
 
 
@@ -54,13 +54,13 @@ def test_remove_service_keys(original: Mapping, expected: Mapping):
     ],
 )
 def test_verify_service_keys(original: Mapping):
-    verify_service_keys_exist(original)
+    assert_service_keys_exist(original)
 
 
 @pytest.mark.parametrize("original", [({}), ({"k": "v"}), ({"k": "v", "k2": "v"})])
 def test_verify_no_service_keys(original: Mapping):
     try:
-        verify_service_keys_exist(original)
+        assert_service_keys_exist(original)
         success = False
     except:  # OK, expected
         success = True
