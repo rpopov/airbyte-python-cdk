@@ -1574,7 +1574,12 @@ class ModelToComponentFactory:
         )
 
     def create_http_requester(
-        self, model: HttpRequesterModel, decoder: Decoder, config: Config, *, name: str
+        self,
+        model: HttpRequesterModel,
+        config: Config,
+        decoder: Decoder = JsonDecoder(parameters={}),
+        *,
+        name: str,
     ) -> HttpRequester:
         authenticator = (
             self._create_component_from_model(
@@ -1990,9 +1995,9 @@ class ModelToComponentFactory:
         config: Config,
         *,
         name: str,
-        transformations: List[RecordTransformation],
-        decoder: Optional[Decoder] = None,
-        client_side_incremental_sync: Optional[Dict[str, Any]] = None,
+        transformations: List[RecordTransformation] | None = None,
+        decoder: Decoder | None = None,
+        client_side_incremental_sync: Dict[str, Any] | None = None,
         **kwargs: Any,
     ) -> RecordSelector:
         assert model.schema_normalization is not None  # for mypy
@@ -2022,7 +2027,7 @@ class ModelToComponentFactory:
             name=name,
             config=config,
             record_filter=record_filter,
-            transformations=transformations,
+            transformations=transformations or [],
             schema_normalization=schema_normalization,
             parameters=model.parameters or {},
         )
