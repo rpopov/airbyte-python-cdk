@@ -13,16 +13,14 @@ from airbyte_cdk.sources.declarative.extractors.record_extractor import (
     exclude_service_keys,
 )
 from airbyte_cdk.sources.declarative.extractors.record_filter import RecordFilter
+from airbyte_cdk.sources.declarative.extractors.type_transformer import (
+    TypeTransformer as DeclarativeTypeTransformer,
+)
 from airbyte_cdk.sources.declarative.interpolation import InterpolatedString
 from airbyte_cdk.sources.declarative.models import SchemaNormalization
 from airbyte_cdk.sources.declarative.transformations import RecordTransformation
 from airbyte_cdk.sources.types import Config, Record, StreamSlice, StreamState
-from airbyte_cdk.sources.utils.transform import TransformConfig, TypeTransformer
-
-SCHEMA_TRANSFORMER_TYPE_MAPPING = {
-    SchemaNormalization.None_: TransformConfig.NoTransform,
-    SchemaNormalization.Default: TransformConfig.DefaultSchemaNormalization,
-}
+from airbyte_cdk.sources.utils.transform import TypeTransformer
 
 
 @dataclass
@@ -41,7 +39,7 @@ class RecordSelector(HttpSelector):
     extractor: RecordExtractor
     config: Config
     parameters: InitVar[Mapping[str, Any]]
-    schema_normalization: TypeTransformer
+    schema_normalization: Union[TypeTransformer, DeclarativeTypeTransformer]
     name: str
     _name: Union[InterpolatedString, str] = field(init=False, repr=False, default="")
     record_filter: Optional[RecordFilter] = None
