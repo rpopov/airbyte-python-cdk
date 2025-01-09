@@ -106,7 +106,6 @@ the value of the **dockerImageTag** parameter.
 - `poetry run ruff check .` to report the formatting issues.
 - `poetry run ruff check --fix` to fix the formatting issues.
 - `poetry run ruff format` to format your Python code.
-- `poetry run poe format-fix` to auto-fix formatting issues.
 
 ### Run Code Linting
 
