@@ -18,7 +18,7 @@ Here are some tips to get started using the project dependencies and development
 
 Fedora 41:
 
-```
+```bash
 sudo dnf install python3.11
 ```
 
@@ -26,7 +26,7 @@ sudo dnf install python3.11
 
 Fedora 41:
 
-```
+```bash
 sudo dnf install pip
 ```
 
@@ -34,36 +34,36 @@ sudo dnf install pip
 
 Fedora 41:
 
-```
+```bash
 sudo dnf install pipx
 ```
 
 4. [Install Poetry](https://python-poetry.org/docs/#):
 
-```
+```bash
 pipx install poetry
 ```
 
 or
 
-```
+```bash
 curl -sSL https://install.python-poetry.org | python3 -
 ```
 Fedora 41:
 
-```
+```bash
 sudo dnf install poetry
 ```
 
 5. In the **airbyte-python-cdk project** install [Poe the Poet](https://poethepoet.natn.io/) and unit tests' prerequisites:
 
-```
+```bash
 poetry install --all-extras
 ```
 
 6. If your operating system is RHEL or compatible, execute:
 
-```
+```bash
 # just for the current session, until restart
 sudo modprobe iptable_nat
 
@@ -141,7 +141,7 @@ In this project, the [GitHub pipelines](.github/workflows/connector-tests.yml) r
 
 - In the `airbyte` project run:
 
-```
+```bash
 cd airbyte/airbyte-integrations/bases/connector-acceptance-test/
 poetry install
 ```
@@ -155,7 +155,7 @@ airbyte_cdk = { path = "../../../../airbyte-python-cdk", develop = true }
 
 - In `airbyte/airbyte-integrations/connectors/<test connector>` reinstall `airbyte_cdk` from your local working directory:
 
-```
+```bash
 cd airbyte/airbyte-integrations/connectors/<test connector>
 poetry install
 ```
@@ -171,7 +171,7 @@ poetry install
     `
     Example contents:
 
-```
+```json
 {
   "shop": "nw0ipt-vr",
   "start_date": "2020-11-01",
@@ -190,7 +190,7 @@ poetry install
 
 - Run the connector's tests (see the connector's README.md)
 
-```
+```bash
 cd airbyte/airbyte-integrations/connectors/<connector name>
 
 poetry run <connector name> spec
@@ -202,7 +202,7 @@ poetry run pytest
 
 Example:
 
-```
+```bash
 cd airbyte/airbyte-integrations/connectors/source-shopify
 
 poetry run source-shopify spec
@@ -214,7 +214,7 @@ poetry run pytest
 
 - Run the acceptance tests locally:
 
-```
+```bash
 cd airbyte/airbyte-integrations/bases/connector-acceptance-test
 
 poetry run pytest -p connector_acceptance_test.plugin --acceptance-test-config=../../connectors/<connector name>
@@ -222,7 +222,7 @@ poetry run pytest -p connector_acceptance_test.plugin --acceptance-test-config=.
 
 Example:
 
-```
+```bash
 poetry run pytest -p connector_acceptance_test.plugin --acceptance-test-config=../../connectors/source-shopify
 
 # or with debug option:
