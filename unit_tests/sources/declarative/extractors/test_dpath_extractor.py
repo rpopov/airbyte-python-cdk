@@ -15,13 +15,6 @@ from airbyte_cdk.sources.declarative.decoders.json_decoder import (
     JsonlDecoder,
 )
 from airbyte_cdk.sources.declarative.extractors.dpath_extractor import DpathExtractor
-from airbyte_cdk import Decoder
-from airbyte_cdk.sources.declarative.decoders.json_decoder import (
-    IterableDecoder,
-    JsonDecoder,
-    JsonlDecoder,
-)
-from airbyte_cdk.sources.declarative.extractors.dpath_extractor import DpathExtractor
 from airbyte_cdk.sources.declarative.extractors.record_extractor import (
     assert_service_keys_exist,
     exclude_service_keys,

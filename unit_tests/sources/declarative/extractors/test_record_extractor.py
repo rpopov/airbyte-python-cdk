@@ -7,10 +7,10 @@ import pytest
 
 from airbyte_cdk.sources.declarative.extractors.record_extractor import (
     SERVICE_KEY_PREFIX,
+    assert_service_keys_exist,
     exclude_service_keys,
     is_service_key,
     remove_service_keys,
-    assert_service_keys_exist,
 )
 
 
