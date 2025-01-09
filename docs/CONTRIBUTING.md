@@ -44,6 +44,11 @@ sudo dnf install pipx
 pipx install poetry
 ```
 
+or
+
+```
+curl -sSL https://install.python-poetry.org | python3 -
+```
 Fedora 41:
 
 ```
