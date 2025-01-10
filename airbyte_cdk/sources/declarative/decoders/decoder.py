@@ -26,7 +26,8 @@ class Decoder:
         self, response: requests.Response
     ) -> Generator[MutableMapping[str, Any], None, None]:
         """
-        Decodes a requests.Response into a Mapping[str, Any] or an array
+        Decodes a requests.Response into a Mapping[str, Any] or an array.
+        The empty response produces an empty list.
         :param response: the response to decode
         :return: Generator of Mapping describing the response
         """

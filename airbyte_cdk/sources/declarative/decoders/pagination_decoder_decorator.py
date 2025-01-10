@@ -34,6 +34,6 @@ class PaginationDecoderDecorator(Decoder):
     ) -> Generator[MutableMapping[str, Any], None, None]:
         if self._decoder.is_stream_response():
             logger.warning("Response is streamed and therefore will not be decoded for pagination.")
-            yield {}
+            yield from []
         else:
             yield from self._decoder.decode(response)
