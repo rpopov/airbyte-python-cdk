@@ -37,7 +37,7 @@ def create_response(body: Union[Dict, bytes]):
 @pytest.mark.parametrize(
     "field_path, decoder, body, expected_records",
     [
-        ([], decoder_json, b"", []),
+        ([], decoder_json, b"", [{}]),  # The JSON contract is irregular, compare with JSONL
         ([], decoder_json, {}, [{}]),
         ([], decoder_json, [], []),
         ([], decoder_json, {"id": 1}, [{"id": 1}]),
@@ -194,7 +194,9 @@ def test_dpath_extractor(field_path: List, decoder: Decoder, body, expected_reco
     actual_records = list(extractor.extract_records(response))
 
     for record in actual_records:
-        assert_service_keys_exist(record)
+        if record != {}:
+            # A valid JSON parsed, see the contract
+            assert_service_keys_exist(record)
 
     actual_records = [exclude_service_keys(record) for record in actual_records]
 

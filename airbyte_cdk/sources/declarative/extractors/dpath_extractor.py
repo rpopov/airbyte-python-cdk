@@ -85,21 +85,25 @@ class DpathExtractor(RecordExtractor):
 
     def extract_records(self, response: requests.Response) -> Iterable[MutableMapping[Any, Any]]:
         for body in self.decoder.decode(response):
-            root_response = body
-            if len(self._field_path) == 0:
-                extracted = body
+            if body == {}:
+                # An empty/invalid JSON parsed, keep the contract
+                yield {}
             else:
-                path = [path.eval(self.config) for path in self._field_path]
-                if "*" in path:
-                    extracted = dpath.values(body, path)
+                root_response = body
+                if len(self._field_path) == 0:
+                    extracted = body
                 else:
-                    extracted = dpath.get(body, path, default=[])  # type: ignore # extracted will be a MutableMapping, given input data structure
-            if isinstance(extracted, list):
-                for record in extracted:
-                    yield update_record(record, root_response)
-            elif isinstance(extracted, dict):
-                yield update_record(extracted, root_response)
-            elif extracted:
-                yield extracted
-            else:
-                yield from []
+                    path = [path.eval(self.config) for path in self._field_path]
+                    if "*" in path:
+                        extracted = dpath.values(body, path)
+                    else:
+                        extracted = dpath.get(body, path, default=[])  # type: ignore # extracted will be a MutableMapping, given input data structure
+                if isinstance(extracted, list):
+                    for record in extracted:
+                        yield update_record(record, root_response)
+                elif isinstance(extracted, dict):
+                    yield update_record(extracted, root_response)
+                elif extracted:
+                    yield extracted
+                else:
+                    yield from []
