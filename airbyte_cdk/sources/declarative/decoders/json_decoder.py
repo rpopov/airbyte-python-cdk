@@ -38,7 +38,7 @@ class JsonDecoder(Decoder):
         except requests.exceptions.JSONDecodeError as ex:
             logger.warning("Response cannot be parsed into json: %s", ex)
             logger.debug("Response to parse: %s", response.text, exc_info=True, stack_info=True)
-            yield {} # Keep the exiting contract
+            yield {}  # Keep the exiting contract
 
     @staticmethod
     def parse_body_json(

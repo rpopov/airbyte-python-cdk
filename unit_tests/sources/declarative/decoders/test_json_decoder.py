@@ -21,7 +21,7 @@ from airbyte_cdk.sources.declarative.parsers.model_to_component_factory import (
 @pytest.mark.parametrize(
     "response_body, expected_json",
     [
-        ("", [{}]), # The JSON contract is irregular
+        ("", [{}]),  # The JSON contract is irregular
         ("{}", [{}]),
         ("[]", []),
         ('{"healthcheck": {"status": "ok"}}', [{"healthcheck": {"status": "ok"}}]),
