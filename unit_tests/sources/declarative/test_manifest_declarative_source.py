@@ -134,7 +134,9 @@ class TestManifestDeclarativeSource:
 
     @pytest.fixture
     def _dynamic_declarative_stream(self, _declarative_stream):
-        """Generates a DynamicDeclarativeStream configuration."""
+        """
+        Generates a DynamicDeclarativeStream configuration.
+        """
         return {
             "type": "DynamicDeclarativeStream",
             "stream_template": _declarative_stream(),
