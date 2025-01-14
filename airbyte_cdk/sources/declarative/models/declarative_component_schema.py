@@ -737,29 +737,39 @@ class KeysToSnakeCase(BaseModel):
     parameters: Optional[Dict[str, Any]] = Field(None, alias="$parameters")
 
 
-class KeysReplace(BaseModel):
-    type: Literal["KeysReplace"]
-    old: str = Field(
-        ...,
-        description="Old value to replace.",
-        examples=[" ", "{{ record.id }}", "{{ config['id'] }}", "{{ stream_slice['id'] }}"],
-        title="Old value",
-    )
-    new: str = Field(
-        ...,
-        description="New value to set.",
-        examples=["_", "{{ record.id }}", "{{ config['id'] }}", "{{ stream_slice['id'] }}"],
-        title="New value",
-    )
-    parameters: Optional[Dict[str, Any]] = Field(None, alias="$parameters")
-
-
 class FlattenFields(BaseModel):
     type: Literal["FlattenFields"]
     flatten_lists: Optional[bool] = Field(
         True,
         description="Whether to flatten lists or leave it as is. Default is True.",
         title="Flatten Lists",
+    )
+    parameters: Optional[Dict[str, Any]] = Field(None, alias="$parameters")
+
+
+class KeysReplace(BaseModel):
+    type: Literal["KeysReplace"]
+    old: str = Field(
+        ...,
+        description="Old value to replace.",
+        examples=[
+            " ",
+            "{{ record.id }}",
+            "{{ config['id'] }}",
+            "{{ stream_slice['id'] }}",
+        ],
+        title="Old value",
+    )
+    new: str = Field(
+        ...,
+        description="New value to set.",
+        examples=[
+            "_",
+            "{{ record.id }}",
+            "{{ config['id'] }}",
+            "{{ stream_slice['id'] }}",
+        ],
+        title="New value",
     )
     parameters: Optional[Dict[str, Any]] = Field(None, alias="$parameters")
 
@@ -2039,6 +2049,10 @@ class AsyncRetriever(BaseModel):
     polling_requester: Union[CustomRequester, HttpRequester] = Field(
         ...,
         description="Requester component that describes how to prepare HTTP requests to send to the source API to fetch the status of the running async job.",
+    )
+    url_requester: Optional[Union[CustomRequester, HttpRequester]] = Field(
+        None,
+        description="Requester component that describes how to prepare HTTP requests to send to the source API to extract the url from polling response by the completed async job.",
     )
     download_requester: Union[CustomRequester, HttpRequester] = Field(
         ...,
