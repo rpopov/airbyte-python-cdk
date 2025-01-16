@@ -719,6 +719,7 @@ class HttpResponseFilter(BaseModel):
 class TypesMap(BaseModel):
     target_type: Union[str, List[str]]
     current_type: Union[str, List[str]]
+    condition: Optional[str]
 
 
 class SchemaTypeIdentifier(BaseModel):
