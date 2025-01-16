@@ -678,7 +678,7 @@ definitions:
     properties:
       type:
         type: string
-        enum: [ CustomSchemaNormalization ]
+        enum: [CustomSchemaNormalization]
       class_name:
         title: Class Name
         description: Fully-qualified name of the class that will be implementing the custom normalization. The format is `source_<name>.<package>.<class_name>`.
@@ -2886,6 +2886,7 @@ definitions:
       parser:
         anyOf:
           - "$ref": "#/definitions/GzipParser"
+          - "$ref": "#/definitions/JsonParser"
           - "$ref": "#/definitions/JsonLineParser"
           - "$ref": "#/definitions/CsvParser"
   #    PARSERS
@@ -2902,6 +2903,20 @@ definitions:
         anyOf:
           - "$ref": "#/definitions/JsonLineParser"
           - "$ref": "#/definitions/CsvParser"
+          - "$ref": "#/definitions/JsonParser"
+  JsonParser:
+    title: JsonParser
+    description: Parser used for parsing str, bytes, or bytearray data and returning data in a dictionary format.
+    type: object
+    required:
+      - type
+    properties:
+      type:
+        type: string
+        enum: [JsonParser]
+      encoding:
+        type: string
+        default: utf-8
   JsonLineParser:
     type: object
     required:
