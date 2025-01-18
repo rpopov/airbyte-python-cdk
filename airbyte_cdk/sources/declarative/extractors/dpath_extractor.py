@@ -22,7 +22,7 @@ RECORD_ROOT_KEY = SERVICE_KEY_PREFIX + "root"
 
 def update_record(record: Any, root: Any) -> Any:
     if isinstance(record, dict):
-        copy = {k: v for k, v in record.items()}
+        copy = dict(record)
         copy.update({RECORD_ROOT_KEY: root})
     else:
         copy = record

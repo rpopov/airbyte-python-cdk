@@ -10,7 +10,7 @@ import requests
 # Convention:
 # - The record extractors may leave service fields bound in the extracted records (mappings).
 # - The names (keys) of the service fields have the value of SERVICE_KEY_PREFIX as their prefix.
-# - The service fields are kept only during the record's filtering and transormation.
+# - The service fields are kept only during the record's filtering and transformation.
 SERVICE_KEY_PREFIX = "$"
 
 
