@@ -9,25 +9,9 @@ import dpath
 import requests
 
 from airbyte_cdk.sources.declarative.decoders import Decoder, JsonDecoder
-from airbyte_cdk.sources.declarative.extractors.record_extractor import (
-    SERVICE_KEY_PREFIX,
-    RecordExtractor,
-)
 from airbyte_cdk.sources.declarative.interpolation.interpolated_string import InterpolatedString
 from airbyte_cdk.sources.types import Config
-
-# The name of the service field to bind the response (root) in each record
-RECORD_ROOT_KEY = SERVICE_KEY_PREFIX + "root"
-
-
-def update_record(record: Any, root: Any) -> Any:
-    if isinstance(record, dict):
-        copy = dict(record)
-        copy.update({RECORD_ROOT_KEY: root})
-    else:
-        copy = record
-    return copy
-
+from airbyte_cdk.sources.declarative.extractors.record_extractor import RecordExtractor
 
 @dataclass
 class DpathExtractor(RecordExtractor):
@@ -90,6 +74,8 @@ class DpathExtractor(RecordExtractor):
                 yield {}
             else:
                 root_response = body
+                body = self.update_body( root_response )
+
                 if len(self._field_path) == 0:
                     extracted = body
                 else:
@@ -100,10 +86,27 @@ class DpathExtractor(RecordExtractor):
                         extracted = dpath.get(body, path, default=[])  # type: ignore # extracted will be a MutableMapping, given input data structure
                 if isinstance(extracted, list):
                     for record in extracted:
-                        yield update_record(record, root_response)
+                        yield self.update_record(record, root_response)
                 elif isinstance(extracted, dict):
-                    yield update_record(extracted, root_response)
+                    yield self.update_record(extracted, root_response)
                 elif extracted:
                     yield extracted
                 else:
                     yield from []
+
+    def update_body(self, body: Any) -> Any:
+        """
+        Change the original response in a subclass-specific way. Override in subclasses.
+        :param body: the original response body. Not to be changed
+        :return: a copy of the body enhanced in a subclass-specific way. None only when body is None.
+        """
+        return body
+
+    def update_record(self, record: Any, root: Any) -> Any:
+        """
+        Change the extracted record in a subclass-specific way. Override in subclasses.
+        :param record: the original extracted record. Not to be changed. Not None.
+        :param root: the original body the record is extracted from.
+        :return: a copy of the record changed or enanced in a subclass-specific way.
+        """
+        return record
