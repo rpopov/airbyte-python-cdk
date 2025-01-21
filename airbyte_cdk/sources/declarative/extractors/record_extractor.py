@@ -29,8 +29,6 @@ def add_service_key(mapping: Mapping[str, Any], key:str, value:Any) -> Mapping[s
 def exclude_service_keys(mapping: Mapping[str, Any]) -> Mapping[str, Any]:
     return {k: v for k, v in mapping.items() if not is_service_key(k)}
 
-
-
 def is_service_key(key: str) -> bool:
     return key.find(_SERVICE_KEY_PREFIX) == 0
 
