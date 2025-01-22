@@ -16,7 +16,6 @@ from airbyte_cdk.sources.declarative.decoders.json_decoder import (
 )
 from airbyte_cdk.sources.declarative.extractors.dpath_extractor import DpathExtractor
 from airbyte_cdk.sources.declarative.extractors.record_extractor import (
-    assert_service_keys_exist,
     exclude_service_keys,
 )
 
@@ -192,12 +191,5 @@ def test_dpath_extractor(field_path: List, decoder: Decoder, body, expected_reco
 
     response = create_response(body)
     actual_records = list(extractor.extract_records(response))
-
-    for record in actual_records:
-        if record != {}:
-            # A valid JSON parsed, see the contract
-            assert_service_keys_exist(record)
-
-    actual_records = [exclude_service_keys(record) for record in actual_records]
 
     assert actual_records == expected_records

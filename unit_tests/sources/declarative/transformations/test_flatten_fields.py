@@ -4,7 +4,7 @@
 
 import pytest
 
-from airbyte_cdk.sources.declarative.extractors.record_extractor import _SERVICE_KEY_PREFIX
+from airbyte_cdk.sources.declarative.extractors.record_extractor import SERVICE_KEY_PREFIX
 from airbyte_cdk.sources.declarative.transformations.flatten_fields import (
     FlattenFields,
 )
@@ -104,9 +104,9 @@ _DO_NOT_FLATTEN_LISTS = False
         ),
         pytest.param(
             _FLATTEN_LISTS,
-            {_SERVICE_KEY_PREFIX + "name": "xyz", "List": ["Item1", "Item2", "Item3"]},
+            {SERVICE_KEY_PREFIX + "name": "xyz", "List": ["Item1", "Item2", "Item3"]},
             {
-                _SERVICE_KEY_PREFIX + "name": "xyz",
+                SERVICE_KEY_PREFIX + "name": "xyz",
                 "List.0": "Item1",
                 "List.1": "Item2",
                 "List.2": "Item3",
@@ -115,9 +115,9 @@ _DO_NOT_FLATTEN_LISTS = False
         ),
         pytest.param(
             _FLATTEN_LISTS,
-            {_SERVICE_KEY_PREFIX + "name": {"k", "xyz"}, "List": ["Item1", "Item2", "Item3"]},
+            {SERVICE_KEY_PREFIX + "name": {"k", "xyz"}, "List": ["Item1", "Item2", "Item3"]},
             {
-                _SERVICE_KEY_PREFIX + "name": {"k", "xyz"},
+                SERVICE_KEY_PREFIX + "name": {"k", "xyz"},
                 "List.0": "Item1",
                 "List.1": "Item2",
                 "List.2": "Item3",

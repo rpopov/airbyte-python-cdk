@@ -13,7 +13,7 @@ from airbyte_cdk.sources.declarative.extractors.dpath_extractor import DpathExtr
 from airbyte_cdk.sources.declarative.extractors.dpath_enhancing_extractor import SERVICE_KEY_ROOT, SERVICE_KEY_PARENT
 from airbyte_cdk.sources.declarative.extractors.record_extractor import (
     exclude_service_keys,
-    _SERVICE_KEY_PREFIX
+    SERVICE_KEY_PREFIX
 )
 from airbyte_cdk.sources.declarative.extractors.record_filter import RecordFilter
 from airbyte_cdk.sources.declarative.extractors.record_selector import RecordSelector
@@ -112,7 +112,7 @@ from airbyte_cdk.sources.utils.transform import TransformConfig, TypeTransformer
         (
             "test_the original response is available in filters and transformations",
             ["data"],
-            "{{ record['created_at'] == record['" +_SERVICE_KEY_PREFIX+SERVICE_KEY_ROOT + "'].data[1].created_at }}",
+            "{{ record['created_at'] == record['" + SERVICE_KEY_PREFIX + SERVICE_KEY_ROOT + "'].data[1].created_at }}",
             {
                 "data": [
                     {"id": 1, "created_at": "06-06-21"},

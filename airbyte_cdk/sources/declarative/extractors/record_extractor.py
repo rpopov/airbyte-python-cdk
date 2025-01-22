@@ -11,7 +11,7 @@ import requests
 # - The record extractors may leave service fields bound in the extracted records (mappings).
 # - The names (keys) of the service fields have the value of SERVICE_KEY_PREFIX as their prefix.
 # - The service fields are kept only during the record's filtering and transformation.
-_SERVICE_KEY_PREFIX = "$"
+SERVICE_KEY_PREFIX = "$"
 
 
 def add_service_key(mapping: Mapping[str, Any], key:str, value:Any) -> Mapping[str, Any]:
@@ -22,18 +22,26 @@ def add_service_key(mapping: Mapping[str, Any], key:str, value:Any) -> Mapping[s
     :return: a non-null copy of the mappibg including a new key-value pair, where the key is prefixed as service field.
     """
     result = dict(mapping)
-    result[_SERVICE_KEY_PREFIX+key] = value
+    result[SERVICE_KEY_PREFIX + key] = value
     return result
 
 
-def exclude_service_keys(mapping: Mapping[str, Any]) -> Mapping[str, Any]:
-    return {k: v for k, v in mapping.items() if not is_service_key(k)}
+def exclude_service_keys(struct: Any) -> Any:
+    """
+    :param struct: any object/JSON structure
+    :return: a copy of struct without any service fields at any level of nesting
+    """
+    if isinstance(struct, dict):
+        result = {k: exclude_service_keys(v) for k, v in struct.items() if not is_service_key(k)}
+    elif isinstance(struct, list):
+        result = [exclude_service_keys(v) for v in struct]
+    else:
+        result = struct
+    return result
 
 def is_service_key(key: str) -> bool:
-    return key.find(_SERVICE_KEY_PREFIX) == 0
+    return key.find(SERVICE_KEY_PREFIX) == 0
 
-def assert_service_keys_exist(self,mapping: Mapping[str, Any]):  # type: ignore[no-untyped-def]
-    assert mapping != exclude_service_keys(mapping), "The mapping should contain service keys"
 
 @dataclass
 class RecordExtractor:
