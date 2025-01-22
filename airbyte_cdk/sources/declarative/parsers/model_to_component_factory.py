@@ -8,7 +8,6 @@ import datetime
 import importlib
 import inspect
 import re
-import sys
 from functools import partial
 from typing import (
     Any,
@@ -102,6 +101,7 @@ from airbyte_cdk.sources.declarative.migrations.legacy_to_per_partition_state_mi
     LegacyToPerPartitionStateMigration,
 )
 from airbyte_cdk.sources.declarative.models import (
+    Clamping,
     CustomStateMigration,
 )
 from airbyte_cdk.sources.declarative.models.declarative_component_schema import (
@@ -461,6 +461,15 @@ from airbyte_cdk.sources.message import (
     InMemoryMessageRepository,
     LogAppenderMessageRepositoryDecorator,
     MessageRepository,
+)
+from airbyte_cdk.sources.streams.concurrent.clamping import (
+    ClampingEndProvider,
+    ClampingStrategy,
+    DayClampingStrategy,
+    MonthClampingStrategy,
+    NoClamping,
+    WeekClampingStrategy,
+    Weekday,
 )
 from airbyte_cdk.sources.streams.concurrent.cursor import ConcurrentCursor, CursorField
 from airbyte_cdk.sources.streams.concurrent.state_converters.datetime_stream_state_converter import (
@@ -1048,6 +1057,53 @@ class ModelToComponentFactory:
             if evaluated_step:
                 step_length = parse_duration(evaluated_step)
 
+        clamping_strategy: ClampingStrategy = NoClamping()
+        if datetime_based_cursor_model.clamping:
+            # While it is undesirable to interpolate within the model factory (as opposed to at runtime),
+            # it is still better than shifting interpolation low-code concept into the ConcurrentCursor runtime
+            # object which we want to keep agnostic of being low-code
+            target = InterpolatedString(
+                string=datetime_based_cursor_model.clamping.target,
+                parameters=datetime_based_cursor_model.parameters or {},
+            )
+            evaluated_target = target.eval(config=config)
+            match evaluated_target:
+                case "DAY":
+                    clamping_strategy = DayClampingStrategy()
+                    end_date_provider = ClampingEndProvider(
+                        DayClampingStrategy(is_ceiling=False),
+                        end_date_provider,  # type: ignore  # Having issues w/ inspection for GapType and CursorValueType as shown in existing tests. Confirmed functionality is working in practice
+                        granularity=cursor_granularity or datetime.timedelta(seconds=1),
+                    )
+                case "WEEK":
+                    if (
+                        not datetime_based_cursor_model.clamping.target_details
+                        or "weekday" not in datetime_based_cursor_model.clamping.target_details
+                    ):
+                        raise ValueError(
+                            "Given WEEK clamping, weekday needs to be provided as target_details"
+                        )
+                    weekday = self._assemble_weekday(
+                        datetime_based_cursor_model.clamping.target_details["weekday"]
+                    )
+                    clamping_strategy = WeekClampingStrategy(weekday)
+                    end_date_provider = ClampingEndProvider(
+                        WeekClampingStrategy(weekday, is_ceiling=False),
+                        end_date_provider,  # type: ignore  # Having issues w/ inspection for GapType and CursorValueType as shown in existing tests. Confirmed functionality is working in practice
+                        granularity=cursor_granularity or datetime.timedelta(days=1),
+                    )
+                case "MONTH":
+                    clamping_strategy = MonthClampingStrategy()
+                    end_date_provider = ClampingEndProvider(
+                        MonthClampingStrategy(is_ceiling=False),
+                        end_date_provider,  # type: ignore  # Having issues w/ inspection for GapType and CursorValueType as shown in existing tests. Confirmed functionality is working in practice
+                        granularity=cursor_granularity or datetime.timedelta(days=1),
+                    )
+                case _:
+                    raise ValueError(
+                        f"Invalid clamping target {evaluated_target}, expected DAY, WEEK, MONTH"
+                    )
+
         return ConcurrentCursor(
             stream_name=stream_name,
             stream_namespace=stream_namespace,
@@ -1062,7 +1118,27 @@ class ModelToComponentFactory:
             lookback_window=lookback_window,
             slice_range=step_length,
             cursor_granularity=cursor_granularity,
+            clamping_strategy=clamping_strategy,
         )
+
+    def _assemble_weekday(self, weekday: str) -> Weekday:
+        match weekday:
+            case "MONDAY":
+                return Weekday.MONDAY
+            case "TUESDAY":
+                return Weekday.TUESDAY
+            case "WEDNESDAY":
+                return Weekday.WEDNESDAY
+            case "THURSDAY":
+                return Weekday.THURSDAY
+            case "FRIDAY":
+                return Weekday.FRIDAY
+            case "SATURDAY":
+                return Weekday.SATURDAY
+            case "SUNDAY":
+                return Weekday.SUNDAY
+            case _:
+                raise ValueError(f"Unknown weekday {weekday}")
 
     @staticmethod
     def create_constant_backoff_strategy(
