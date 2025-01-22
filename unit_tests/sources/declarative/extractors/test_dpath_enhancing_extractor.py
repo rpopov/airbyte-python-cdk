@@ -14,8 +14,11 @@ from airbyte_cdk.sources.declarative.decoders.json_decoder import (
     JsonDecoder,
     JsonlDecoder,
 )
-from airbyte_cdk.sources.declarative.extractors.dpath_enhancing_extractor import DpathEnhancingExtractor, \
-    SERVICE_KEY_ROOT, SERVICE_KEY_PARENT
+from airbyte_cdk.sources.declarative.extractors.dpath_enhancing_extractor import (
+    SERVICE_KEY_PARENT,
+    SERVICE_KEY_ROOT,
+    DpathEnhancingExtractor,
+)
 from airbyte_cdk.sources.declarative.extractors.record_extractor import (
     SERVICE_KEY_PREFIX,
 )

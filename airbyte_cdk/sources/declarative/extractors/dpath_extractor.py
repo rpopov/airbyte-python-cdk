@@ -9,9 +9,10 @@ import dpath
 import requests
 
 from airbyte_cdk.sources.declarative.decoders import Decoder, JsonDecoder
+from airbyte_cdk.sources.declarative.extractors.record_extractor import RecordExtractor
 from airbyte_cdk.sources.declarative.interpolation.interpolated_string import InterpolatedString
 from airbyte_cdk.sources.types import Config
-from airbyte_cdk.sources.declarative.extractors.record_extractor import RecordExtractor
+
 
 @dataclass
 class DpathExtractor(RecordExtractor):

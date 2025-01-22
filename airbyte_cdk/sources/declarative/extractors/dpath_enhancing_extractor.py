@@ -6,8 +6,11 @@ from dataclasses import InitVar, dataclass, field
 from typing import Any, Iterable, List, Mapping, MutableMapping, Union
 
 from airbyte_cdk.sources.declarative.extractors.dpath_extractor import DpathExtractor
-
-from airbyte_cdk.sources.declarative.extractors.record_extractor import add_service_key,is_service_key,SERVICE_KEY_PREFIX
+from airbyte_cdk.sources.declarative.extractors.record_extractor import (
+    SERVICE_KEY_PREFIX,
+    add_service_key,
+    is_service_key,
+)
 
 # The name of the service key that holds a reference to the original root response
 SERVICE_KEY_ROOT = "root"
@@ -109,7 +112,7 @@ class DpathEnhancingExtractor(DpathExtractor):
         :return: a copy of the body enhanced in a subclass-specific way. None only when body is None.
         """
         if isinstance(body, dict):
-            result = dict()
+            result:dict[str, Any] = dict()
             if parent:
                 result = add_service_key(result, SERVICE_KEY_PARENT, parent)
             attributes_only = dict(result)
@@ -117,11 +120,11 @@ class DpathEnhancingExtractor(DpathExtractor):
                                           if v and not isinstance(v,dict)  and not isinstance(v,list)})
             for k,v in body.items():
                 result[k] = self._set_parent(v,attributes_only)
+            return result
         elif isinstance(body, list):
-            result = [self._set_parent(v,parent) for v in body]
+            return [self._set_parent(v,parent) for v in body]
         else:
-            result = body
-        return result
+            return body
 
     def update_record(self, record: Any, root: Any) -> Any:
         """

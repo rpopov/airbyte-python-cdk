@@ -99,7 +99,7 @@ the value of the **dockerImageTag** parameter.
 - `poetry run pytest` to run all unit tests.
 - `poetry run pytest -k <suite or test name>` to run specific unit tests.
 - `poetry run pytest-fast` to run the subset of PyTest tests, which are not flagged as `slow`. (It should take <5 min for fast tests only.)
-- `python -m pytest -s unit_tests` if you want to pass pytest options.
+- `poetry run pytest -s unit_tests` if you want to pass pytest options.
 
 ### Run Code Formatting
 

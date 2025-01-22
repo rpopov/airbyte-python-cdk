@@ -9,11 +9,14 @@ import pytest
 import requests
 
 from airbyte_cdk.sources.declarative.decoders.json_decoder import JsonDecoder
+from airbyte_cdk.sources.declarative.extractors.dpath_enhancing_extractor import (
+    SERVICE_KEY_PARENT,
+    SERVICE_KEY_ROOT,
+)
 from airbyte_cdk.sources.declarative.extractors.dpath_extractor import DpathExtractor
-from airbyte_cdk.sources.declarative.extractors.dpath_enhancing_extractor import SERVICE_KEY_ROOT, SERVICE_KEY_PARENT
 from airbyte_cdk.sources.declarative.extractors.record_extractor import (
+    SERVICE_KEY_PREFIX,
     exclude_service_keys,
-    SERVICE_KEY_PREFIX
 )
 from airbyte_cdk.sources.declarative.extractors.record_filter import RecordFilter
 from airbyte_cdk.sources.declarative.extractors.record_selector import RecordSelector
