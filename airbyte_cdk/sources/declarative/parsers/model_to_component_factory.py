@@ -2386,7 +2386,7 @@ class ModelToComponentFactory:
         if (
             not isinstance(stream_slicer, DatetimeBasedCursor)
             or type(stream_slicer) is not DatetimeBasedCursor
-        ) and not isinstance(stream_slicer, PerPartitionWithGlobalCursor):
+        ):
             # Many of the custom component implementations of DatetimeBasedCursor override get_request_params() (or other methods).
             # Because we're decoupling RequestOptionsProvider from the Cursor, custom components will eventually need to reimplement
             # their own RequestOptionsProvider. However, right now the existing StreamSlicer/Cursor still can act as the SimpleRetriever's
