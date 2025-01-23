@@ -95,6 +95,7 @@ the value of the **dockerImageTag** parameter.
 - Iterate on the CDK code locally.
 
 ### Run Unit Tests
+To see all available `ruff` options, run `poetry run ruff`.
 
 - `poetry run pytest` to run all unit tests.
 - `poetry run pytest -k <suite or test name>` to run specific unit tests.
@@ -263,6 +264,7 @@ Note that the local CDK is injected at build time, so if you make changes, you m
 The Airbyte CDK defines common development tasks using [Poe the Poet](https://poethepoet.natn.io/). You can run `poetry run poe list` to see all available tasks. This will work after `poetry install --all-extras` without additional installations.
 
 Optionally, if you can [pre-install Poe](https://poethepoet.natn.io/installation.html) with `pipx install poethepoet` and then you will be able to run Poe tasks with the shorter `poe TASKNAME` syntax instead of `poetry run poe TASKNAME`.
+The Ruff configuration is stored in `ruff.toml` at the root of the repository. This file contains settings for line length, target Python version, and linting rules.
 
 ## Auto-Generating the Declarative Schema File
 
