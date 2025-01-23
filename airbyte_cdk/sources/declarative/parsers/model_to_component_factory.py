@@ -2100,6 +2100,12 @@ class ModelToComponentFactory:
     def create_oauth_authenticator(
         self, model: OAuthAuthenticatorModel, config: Config, **kwargs: Any
     ) -> DeclarativeOauth2Authenticator:
+        profile_assertion = (
+            self._create_component_from_model(model.profile_assertion, config=config)
+            if model.profile_assertion
+            else None
+        )
+
         if model.refresh_token_updater:
             # ignore type error because fixing it would have a lot of dependencies, revisit later
             return DeclarativeSingleUseRefreshTokenOauth2Authenticator(  # type: ignore
@@ -2120,13 +2126,17 @@ class ModelToComponentFactory:
                 ).eval(config),
                 client_id=InterpolatedString.create(
                     model.client_id, parameters=model.parameters or {}
-                ).eval(config),
+                ).eval(config)
+                if model.client_id
+                else model.client_id,
                 client_secret_name=InterpolatedString.create(
                     model.client_secret_name or "client_secret", parameters=model.parameters or {}
                 ).eval(config),
                 client_secret=InterpolatedString.create(
                     model.client_secret, parameters=model.parameters or {}
-                ).eval(config),
+                ).eval(config)
+                if model.client_secret
+                else model.client_secret,
                 access_token_config_path=model.refresh_token_updater.access_token_config_path,
                 refresh_token_config_path=model.refresh_token_updater.refresh_token_config_path,
                 token_expiry_date_config_path=model.refresh_token_updater.token_expiry_date_config_path,
@@ -2172,6 +2182,8 @@ class ModelToComponentFactory:
             config=config,
             parameters=model.parameters or {},
             message_repository=self._message_repository,
+            profile_assertion=profile_assertion,
+            use_profile_assertion=model.use_profile_assertion,
         )
 
     def create_offset_increment(
