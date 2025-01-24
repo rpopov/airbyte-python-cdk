@@ -14,7 +14,7 @@ Thank you for being interested in contributing to Airbyte Python CDK! Here are s
 Here are some tips to get started using the project dependencies and development tools:
 
 1. Clone the CDK repo. If you will be testing connectors, you should clone the CDK into the same parent directory as `airbytehq/airbyte`, which contains the connector definitions.
-2. Make sure your Python version is 3.10 or 3.11
+2. Make sure your Python version is 3.11
 
 Fedora 41:
 
@@ -30,18 +30,10 @@ Fedora 41:
 sudo dnf install pip
 ```
 
-3. [Install pipx](https://pipx.pypa.io/stable/installation/)
-
-Fedora 41:
+3. [Install Poetry](https://python-poetry.org/docs/#):
 
 ```bash
-sudo dnf install pipx
-```
-
-4. [Install Poetry](https://python-poetry.org/docs/#):
-
-```bash
-pipx install poetry
+pip install poetry
 ```
 
 or
@@ -55,13 +47,31 @@ Fedora 41:
 sudo dnf install poetry
 ```
 
-5. In the **airbyte-python-cdk project** install [Poe the Poet](https://poethepoet.natn.io/) and unit tests' prerequisites:
+4 Use the Python 3.11 environment:
+
+```bash
+poetry env info
+# validate 3.11 is active
+
+# otherwise:
+poetry env list
+# remove any other environment:
+poetry env remove <env>
+# example:  project_name-QI_LjVaV-py3.9
+
+# Use the proper version:
+poetry env use /usr/bin/python3.11
+poetry env info
+# validate 3.11 referred
+```
+
+5 In the **airbyte-python-cdk project** install [Poe the Poet](https://poethepoet.natn.io/) and unit tests' prerequisites:
 
 ```bash
 poetry install --all-extras
 ```
 
-6. If your operating system is RHEL or compatible, execute:
+6 If your operating system is RHEL or compatible, execute:
 
 ```bash
 # just for the current session, until restart
