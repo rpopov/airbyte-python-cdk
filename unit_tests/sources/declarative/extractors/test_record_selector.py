@@ -14,10 +14,6 @@ from airbyte_cdk.sources.declarative.extractors.dpath_enhancing_extractor import
     SERVICE_KEY_ROOT,
 )
 from airbyte_cdk.sources.declarative.extractors.dpath_extractor import DpathExtractor
-from airbyte_cdk.sources.declarative.extractors.record_extractor import (
-    SERVICE_KEY_PREFIX,
-    exclude_service_keys,
-)
 from airbyte_cdk.sources.declarative.extractors.record_filter import RecordFilter
 from airbyte_cdk.sources.declarative.extractors.record_selector import RecordSelector
 from airbyte_cdk.sources.declarative.transformations import RecordTransformation
@@ -112,19 +108,6 @@ from airbyte_cdk.sources.utils.transform import TransformConfig, TypeTransformer
             [],
             [],
         ),
-        (
-            "test_the original response is available in filters and transformations",
-            ["data"],
-            "{{ record['created_at'] == record['" + SERVICE_KEY_PREFIX + SERVICE_KEY_ROOT + "'].data[1].created_at }}",
-            {
-                "data": [
-                    {"id": 1, "created_at": "06-06-21"},
-                    {"id": 2, "created_at": "06-07-21"},
-                    {"id": 3, "created_at": "06-08-21"},
-                ]
-            },
-            [{"id": 2, "created_at": "06-07-21"}],
-        ),
     ],
 )
 def test_record_filter(test_name, field_path, filter_template, body, expected_data):
@@ -167,10 +150,9 @@ def test_record_filter(test_name, field_path, filter_template, body, expected_da
             next_page_token=next_page_token,
         )
     )
-
-    actual_records = [exclude_service_keys(record) for record in actual_records]
-    assert actual_records == expected_data
-
+    assert actual_records == [
+        Record(data=data, associated_slice=stream_slice, stream_name="") for data in expected_data
+    ]
 
 @pytest.mark.parametrize(
     "test_name, schema, schema_transformation, body, expected_data",
@@ -242,9 +224,7 @@ def test_schema_normalization(test_name, schema, schema_transformation, body, ex
         )
     )
 
-    actual_records = [exclude_service_keys(record) for record in actual_records]
-
-    assert actual_records == expected_data
+    assert actual_records == [Record(data, stream_slice) for data in expected_data]
 
 
 def create_response(body):

@@ -35,16 +35,15 @@ class FlattenFields(RecordTransformation):
 
             if isinstance(current_record, dict):
                 for current_key, value in current_record.items():
-                    if not is_service_key(current_key):
+                    if is_service_key(current_key):
+                        transformed_record[current_key] = value
+                    else:
                         new_key = (
                             f"{parent_key}.{current_key}"
                             if (current_key in transformed_record or force_with_parent_name)
                             else current_key
                         )
                         stack.append((value, new_key))
-                    else:
-                        # transfer the service fields without change
-                        transformed_record[current_key] = value
 
             elif isinstance(current_record, list) and self.flatten_lists:
                 for i, item in enumerate(current_record):

@@ -42,6 +42,11 @@ def is_service_key(key: str) -> bool:
     return key.find(SERVICE_KEY_PREFIX) == 0
 
 
+def remove_service_keys(records: Iterable[Mapping[str, Any]]) -> Iterable[Mapping[str, Any]]:
+    for record in records:
+        yield exclude_service_keys(record)
+
+
 @dataclass
 class RecordExtractor:
     """
@@ -59,10 +64,3 @@ class RecordExtractor:
         :return: List of Records extracted from the response
         """
         pass
-
-
-    def remove_service_keys(self,
-                            records: Iterable[Mapping[str, Any]]
-                            ) -> Iterable[Mapping[str, Any]]:
-        for record in records:
-            yield exclude_service_keys(record)

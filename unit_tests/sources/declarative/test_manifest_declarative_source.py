@@ -135,9 +135,7 @@ class TestManifestDeclarativeSource:
 
     @pytest.fixture
     def _dynamic_declarative_stream(self, _declarative_stream):
-        """
-        Generates a DynamicDeclarativeStream configuration.
-        """
+        """Generates a DynamicDeclarativeStream configuration."""
         return {
             "type": "DynamicDeclarativeStream",
             "stream_template": _declarative_stream(),
@@ -1776,7 +1774,6 @@ def test_read_manifest_declarative_source(
         output_data = [
             message.record.data for message in _run_read(manifest, _stream_name) if message.record
         ]
-
         assert output_data == expected_records
         mock_retriever.assert_has_calls(expected_calls)
 

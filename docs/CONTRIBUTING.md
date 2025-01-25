@@ -55,9 +55,6 @@ poetry env info
 
 # otherwise:
 poetry env list
-# remove any other environment:
-poetry env remove <env>
-# example:  project_name-QI_LjVaV-py3.9
 
 # Use the proper version:
 poetry env use /usr/bin/python3.11
