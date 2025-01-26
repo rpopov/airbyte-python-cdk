@@ -32,9 +32,13 @@ class PageIncrement(PaginationStrategy):
 
     def __post_init__(self, parameters: Mapping[str, Any]) -> None:
         if not isinstance(self.page_size, int) and not (self.page_size is None):
-            self.page_size = InterpolatedString(self.page_size, parameters=parameters).eval(self.config)
+            self.page_size = InterpolatedString(self.page_size, parameters=parameters).eval(
+                self.config
+            )
             if not isinstance(self.page_size, int):
-                raise Exception(f"{self.page_size} is of type {type(self.page_size)}. Expected {int}")
+                raise Exception(
+                    f"{self.page_size} is of type {type(self.page_size)}. Expected {int}"
+                )
         self._page_size = self.page_size
 
     @property

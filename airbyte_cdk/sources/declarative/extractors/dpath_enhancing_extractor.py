@@ -18,6 +18,7 @@ SERVICE_KEY_ROOT = "root"
 # The name of the service key that holds a reference to the owner object
 SERVICE_KEY_PARENT = "parent"
 
+
 @dataclass
 class DpathEnhancingExtractor(DpathExtractor):
     """
@@ -103,26 +104,31 @@ class DpathEnhancingExtractor(DpathExtractor):
                  extracted from the nested objects will have access to any parent's attributes still avoiding loops
                  in the JSON structure.
         """
-        return self._set_parent(body,None)
+        return self._set_parent(body, None)
 
-    def _set_parent(self,body: Any, parent:Any) -> Any:
+    def _set_parent(self, body: Any, parent: Any) -> Any:
         """
         :param body: the original response body. Not to be changed
         :param parent: none or the parent object that owns/has as nested the body object
         :return: a copy of the body enhanced in a subclass-specific way. None only when body is None.
         """
         if isinstance(body, dict):
-            result:dict[str, Any] = dict()
+            result: dict[str, Any] = dict()
             if parent:
                 result = add_service_key(result, SERVICE_KEY_PARENT, parent)
             attributes_only = dict(result)
-            attributes_only.update({k:v for k,v in body.items()
-                                          if v and not isinstance(v,dict)  and not isinstance(v,list)})
-            for k,v in body.items():
-                result[k] = self._set_parent(v,attributes_only)
+            attributes_only.update(
+                {
+                    k: v
+                    for k, v in body.items()
+                    if v and not isinstance(v, dict) and not isinstance(v, list)
+                }
+            )
+            for k, v in body.items():
+                result[k] = self._set_parent(v, attributes_only)
             return result
         elif isinstance(body, list):
-            return [self._set_parent(v,parent) for v in body]
+            return [self._set_parent(v, parent) for v in body]
         else:
             return body
 

@@ -14,7 +14,7 @@ import requests
 SERVICE_KEY_PREFIX = "$"
 
 
-def add_service_key(mapping: Mapping[str, Any], key:str, value:Any) -> dict[str, Any]:
+def add_service_key(mapping: Mapping[str, Any], key: str, value: Any) -> dict[str, Any]:
     """
     :param mapping: non-null mapping
     :param key: the name of the key, not including any specific prefixes
@@ -37,6 +37,7 @@ def exclude_service_keys(struct: Any) -> Any:
         return [exclude_service_keys(v) for v in struct]
     else:
         return struct
+
 
 def is_service_key(key: str) -> bool:
     return key.find(SERVICE_KEY_PREFIX) == 0

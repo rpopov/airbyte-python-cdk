@@ -75,7 +75,7 @@ class DpathExtractor(RecordExtractor):
                 yield {}
             else:
                 root_response = body
-                body = self.update_body( root_response )
+                body = self.update_body(root_response)
 
                 if len(self._field_path) == 0:
                     extracted = body

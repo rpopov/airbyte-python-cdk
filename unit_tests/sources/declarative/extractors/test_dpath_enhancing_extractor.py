@@ -46,63 +46,147 @@ def create_response(body: Union[Dict, bytes]):
         ([], decoder_json, b"", [{}]),  # The JSON contract is irregular, compare with JSONL
         ([], decoder_json, {}, [{}]),
         ([], decoder_json, [], []),
-        ([], decoder_json, {"id": 1}, [{"id": 1, ROOT: {'id': 1}}]),
-        ([], decoder_json, [{"id": 1}, {"id": 2}], [{"id": 1, ROOT:{"id": 1}}, {"id": 2, ROOT:{"id": 2}}]),
-        ([], decoder_json, [{"id": 1, "nested": {"id2": 2}}],
-                           [{"id": 1, "nested": {"id2": 2, PARENT:{"id":1}}, ROOT:{"id": 1, "nested": {"id2": 2}}}]),
+        ([], decoder_json, {"id": 1}, [{"id": 1, ROOT: {"id": 1}}]),
+        (
+            [],
+            decoder_json,
+            [{"id": 1}, {"id": 2}],
+            [{"id": 1, ROOT: {"id": 1}}, {"id": 2, ROOT: {"id": 2}}],
+        ),
+        (
+            [],
+            decoder_json,
+            [{"id": 1, "nested": {"id2": 2}}],
+            [
+                {
+                    "id": 1,
+                    "nested": {"id2": 2, PARENT: {"id": 1}},
+                    ROOT: {"id": 1, "nested": {"id2": 2}},
+                }
+            ],
+        ),
         (
             [],
             decoder_json,
             [{"id": 1, "nested": {"id2": 2, "id3": 3}}],
-            [{"id": 1, "nested": {"id2": 2, "id3": 3, PARENT:{"id":1}}, ROOT:{"id": 1, "nested": {"id2": 2, "id3": 3}}}],
+            [
+                {
+                    "id": 1,
+                    "nested": {"id2": 2, "id3": 3, PARENT: {"id": 1}},
+                    ROOT: {"id": 1, "nested": {"id2": 2, "id3": 3}},
+                }
+            ],
         ),
         (
             [],
             decoder_json,
             [{"id": 1, "nested": {"id2": 2}}, {"id": 3, "nested": {"id4": 4}}],
-            [{"id": 1, "nested": {"id2": 2, PARENT:{"id":1}}, ROOT:{"id": 1, "nested": {"id2": 2}}},
-             {"id": 3, "nested": {"id4": 4, PARENT:{"id":3}}, ROOT:{"id": 3, "nested": {"id4": 4}}}],
+            [
+                {
+                    "id": 1,
+                    "nested": {"id2": 2, PARENT: {"id": 1}},
+                    ROOT: {"id": 1, "nested": {"id2": 2}},
+                },
+                {
+                    "id": 3,
+                    "nested": {"id4": 4, PARENT: {"id": 3}},
+                    ROOT: {"id": 3, "nested": {"id4": 4}},
+                },
+            ],
         ),
         (
             [],
             decoder_json,
             [{"id": 1, "nested": {"id2": 2, "id3": 3}}, {"id": 3, "nested": {"id4": 4, "id5": 5}}],
-            [{"id": 1, "nested": {"id2": 2, "id3": 3, PARENT:{"id":1}}, ROOT:{"id": 1, "nested": {"id2": 2, "id3": 3}}},
-             {"id": 3, "nested": {"id4": 4, "id5": 5, PARENT:{"id":3}}, ROOT:{"id": 3, "nested": {"id4": 4, "id5": 5}}}],
+            [
+                {
+                    "id": 1,
+                    "nested": {"id2": 2, "id3": 3, PARENT: {"id": 1}},
+                    ROOT: {"id": 1, "nested": {"id2": 2, "id3": 3}},
+                },
+                {
+                    "id": 3,
+                    "nested": {"id4": 4, "id5": 5, PARENT: {"id": 3}},
+                    ROOT: {"id": 3, "nested": {"id4": 4, "id5": 5}},
+                },
+            ],
         ),
-        (["data"], decoder_json, {"data": {"id": 1}}, [{"id": 1, ROOT:{"data": {"id": 1}}}]),
-        (["data"], decoder_json, {"data": [{"id": 1}, {"id": 2}]},
-         [{"id": 1, ROOT:{"data": [{"id": 1}, {"id": 2}]}},
-          {"id": 2, ROOT:{"data": [{"id": 1}, {"id": 2}]}}]),
-
-        (["data"], decoder_json, {"data": [{"id": 1}, {"id": 2}],"id3":3},
-         [{"id": 1, PARENT:{"id3":3}, ROOT:{"data": [{"id": 1}, {"id": 2}], "id3":3}},
-          {"id": 2, PARENT:{"id3":3}, ROOT:{"data": [{"id": 1}, {"id": 2}], "id3":3}}]),
+        (["data"], decoder_json, {"data": {"id": 1}}, [{"id": 1, ROOT: {"data": {"id": 1}}}]),
+        (
+            ["data"],
+            decoder_json,
+            {"data": [{"id": 1}, {"id": 2}]},
+            [
+                {"id": 1, ROOT: {"data": [{"id": 1}, {"id": 2}]}},
+                {"id": 2, ROOT: {"data": [{"id": 1}, {"id": 2}]}},
+            ],
+        ),
+        (
+            ["data"],
+            decoder_json,
+            {"data": [{"id": 1}, {"id": 2}], "id3": 3},
+            [
+                {"id": 1, PARENT: {"id3": 3}, ROOT: {"data": [{"id": 1}, {"id": 2}], "id3": 3}},
+                {"id": 2, PARENT: {"id3": 3}, ROOT: {"data": [{"id": 1}, {"id": 2}], "id3": 3}},
+            ],
+        ),
         (
             ["data"],
             decoder_json,
             {"data": [{"id": 1, "nested": {"id2": 2}}]},
-            [{"id": 1, "nested": {"id2": 2, PARENT:{"id":1}}, ROOT:{"data": [{"id": 1, "nested": {"id2": 2}}]}}],
+            [
+                {
+                    "id": 1,
+                    "nested": {"id2": 2, PARENT: {"id": 1}},
+                    ROOT: {"data": [{"id": 1, "nested": {"id2": 2}}]},
+                }
+            ],
         ),
         (
             ["data"],
             decoder_json,
-            {"data": [{"id": 1, "nested": {"id2": 2}}],"id3":3},
-            [{"id": 1, "nested": {"id2": 2, PARENT:{"id":1,PARENT:{"id3":3}}},PARENT:{"id3":3}, ROOT:{"data": [{"id": 1, "nested": {"id2": 2}}], "id3":3}}],
+            {"data": [{"id": 1, "nested": {"id2": 2}}], "id3": 3},
+            [
+                {
+                    "id": 1,
+                    "nested": {"id2": 2, PARENT: {"id": 1, PARENT: {"id3": 3}}},
+                    PARENT: {"id3": 3},
+                    ROOT: {"data": [{"id": 1, "nested": {"id2": 2}}], "id3": 3},
+                }
+            ],
         ),
         (
             ["data"],
             decoder_json,
             {"data": [{"id": 1, "nested": {"id2": 2, "id3": 3}}]},
-            [{"id": 1, "nested": {"id2": 2, "id3": 3,PARENT:{"id":1}},ROOT:{"data": [{"id": 1, "nested": {"id2": 2, "id3": 3}}]}}],
+            [
+                {
+                    "id": 1,
+                    "nested": {"id2": 2, "id3": 3, PARENT: {"id": 1}},
+                    ROOT: {"data": [{"id": 1, "nested": {"id2": 2, "id3": 3}}]},
+                }
+            ],
         ),
         (
             ["data"],
             decoder_json,
             {"data": [{"id": 1, "nested": {"id2": 2}}, {"id": 3, "nested": {"id4": 4}}]},
-            [{"id": 1, "nested": {"id2": 2,PARENT:{"id":1}},ROOT:{"data": [{"id": 1, "nested": {"id2": 2}}, {"id": 3, "nested": {"id4": 4}}]}},
-             {"id": 3, "nested": {"id4": 4,PARENT:{"id":3}},ROOT:{"data": [{"id": 1, "nested": {"id2": 2}}, {"id": 3, "nested": {"id4": 4}}]}}],
-
+            [
+                {
+                    "id": 1,
+                    "nested": {"id2": 2, PARENT: {"id": 1}},
+                    ROOT: {
+                        "data": [{"id": 1, "nested": {"id2": 2}}, {"id": 3, "nested": {"id4": 4}}]
+                    },
+                },
+                {
+                    "id": 3,
+                    "nested": {"id4": 4, PARENT: {"id": 3}},
+                    ROOT: {
+                        "data": [{"id": 1, "nested": {"id2": 2}}, {"id": 3, "nested": {"id4": 4}}]
+                    },
+                },
+            ],
         ),
         (
             ["data"],
@@ -113,45 +197,63 @@ def create_response(body: Union[Dict, bytes]):
                     {"id": 3, "nested": {"id4": 4, "id5": 5}},
                 ]
             },
-            [{"id": 1, "nested": {"id2": 2, "id3": 3,PARENT:{"id":1}}, ROOT:{
-                "data": [
-                    {"id": 1, "nested": {"id2": 2, "id3": 3}},
-                    {"id": 3, "nested": {"id4": 4, "id5": 5}},
-                ]
-            }},
-             {"id": 3, "nested": {"id4": 4, "id5": 5,PARENT:{"id":3}}, ROOT:{
-                "data": [
-                    {"id": 1, "nested": {"id2": 2, "id3": 3}},
-                    {"id": 3, "nested": {"id4": 4, "id5": 5}},
-                ]
-            }}],
+            [
+                {
+                    "id": 1,
+                    "nested": {"id2": 2, "id3": 3, PARENT: {"id": 1}},
+                    ROOT: {
+                        "data": [
+                            {"id": 1, "nested": {"id2": 2, "id3": 3}},
+                            {"id": 3, "nested": {"id4": 4, "id5": 5}},
+                        ]
+                    },
+                },
+                {
+                    "id": 3,
+                    "nested": {"id4": 4, "id5": 5, PARENT: {"id": 3}},
+                    ROOT: {
+                        "data": [
+                            {"id": 1, "nested": {"id2": 2, "id3": 3}},
+                            {"id": 3, "nested": {"id4": 4, "id5": 5}},
+                        ]
+                    },
+                },
+            ],
         ),
         (
             ["data", "records"],
             decoder_json,
             {"data": {"records": [{"id": 1}, {"id": 2}]}},
-            [{"id": 1, ROOT:{"data": {"records": [{"id": 1}, {"id": 2}]}}},
-             {"id": 2, ROOT:{"data": {"records": [{"id": 1}, {"id": 2}]}}}],
+            [
+                {"id": 1, ROOT: {"data": {"records": [{"id": 1}, {"id": 2}]}}},
+                {"id": 2, ROOT: {"data": {"records": [{"id": 1}, {"id": 2}]}}},
+            ],
         ),
         (
             ["{{ config['field'] }}"],
             decoder_json,
             {"record_array": [{"id": 1}, {"id": 2}]},
-            [{"id": 1, ROOT:{"record_array": [{"id": 1}, {"id": 2}]}},
-             {"id": 2, ROOT:{"record_array": [{"id": 1}, {"id": 2}]}}],
+            [
+                {"id": 1, ROOT: {"record_array": [{"id": 1}, {"id": 2}]}},
+                {"id": 2, ROOT: {"record_array": [{"id": 1}, {"id": 2}]}},
+            ],
         ),
         (
             ["{{ parameters['parameters_field'] }}"],
             decoder_json,
             {"record_array": [{"id": 1}, {"id": 2}]},
-            [{"id": 1, ROOT:{"record_array": [{"id": 1}, {"id": 2}]}},
-             {"id": 2, ROOT:{"record_array": [{"id": 1}, {"id": 2}]}}],
+            [
+                {"id": 1, ROOT: {"record_array": [{"id": 1}, {"id": 2}]}},
+                {"id": 2, ROOT: {"record_array": [{"id": 1}, {"id": 2}]}},
+            ],
         ),
         (["record"], decoder_json, {"id": 1}, []),
-        (["list", "*", "item"],
-         decoder_json,
-         {"list": [{"item": {"id": "1"}}]},
-         [{"id": "1", ROOT:{"list": [{"item": {"id": "1"}}]}}]),
+        (
+            ["list", "*", "item"],
+            decoder_json,
+            {"list": [{"item": {"id": "1"}}]},
+            [{"id": "1", ROOT: {"list": [{"item": {"id": "1"}}]}}],
+        ),
         (
             ["data", "*", "list", "data2", "*"],
             decoder_json,
@@ -161,31 +263,45 @@ def create_response(body: Union[Dict, bytes]):
                     {"list": {"data2": [{"id": 3}, {"id": 4}]}},
                 ]
             },
-            [{"id": 1, ROOT:{
-                "data": [
-                    {"list": {"data2": [{"id": 1}, {"id": 2}]}},
-                    {"list": {"data2": [{"id": 3}, {"id": 4}]}},
-                ]
-            }},
-             {"id": 2, ROOT:{
-                "data": [
-                    {"list": {"data2": [{"id": 1}, {"id": 2}]}},
-                    {"list": {"data2": [{"id": 3}, {"id": 4}]}},
-                ]
-            }},
-             {"id": 3, ROOT:{
-                "data": [
-                    {"list": {"data2": [{"id": 1}, {"id": 2}]}},
-                    {"list": {"data2": [{"id": 3}, {"id": 4}]}},
-                ]
-            }},
-             {"id": 4, ROOT:{
-                "data": [
-                    {"list": {"data2": [{"id": 1}, {"id": 2}]}},
-                    {"list": {"data2": [{"id": 3}, {"id": 4}]}},
-                ]
-            }}],
-        )
+            [
+                {
+                    "id": 1,
+                    ROOT: {
+                        "data": [
+                            {"list": {"data2": [{"id": 1}, {"id": 2}]}},
+                            {"list": {"data2": [{"id": 3}, {"id": 4}]}},
+                        ]
+                    },
+                },
+                {
+                    "id": 2,
+                    ROOT: {
+                        "data": [
+                            {"list": {"data2": [{"id": 1}, {"id": 2}]}},
+                            {"list": {"data2": [{"id": 3}, {"id": 4}]}},
+                        ]
+                    },
+                },
+                {
+                    "id": 3,
+                    ROOT: {
+                        "data": [
+                            {"list": {"data2": [{"id": 1}, {"id": 2}]}},
+                            {"list": {"data2": [{"id": 3}, {"id": 4}]}},
+                        ]
+                    },
+                },
+                {
+                    "id": 4,
+                    ROOT: {
+                        "data": [
+                            {"list": {"data2": [{"id": 1}, {"id": 2}]}},
+                            {"list": {"data2": [{"id": 3}, {"id": 4}]}},
+                        ]
+                    },
+                },
+            ],
+        ),
     ],
     ids=[
         "test_extract_from_empty_string",
@@ -210,7 +326,7 @@ def create_response(body: Union[Dict, bytes]):
         "test_field_in_parameters",
         "test_field_does_not_exist",
         "test_nested_list",
-        "test_complex_nested_list"
+        "test_complex_nested_list",
     ],
 )
 def test_dpath_extractor(field_path: List, decoder: Decoder, body, expected_records: List):

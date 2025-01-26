@@ -154,6 +154,7 @@ def test_record_filter(test_name, field_path, filter_template, body, expected_da
         Record(data=data, associated_slice=stream_slice, stream_name="") for data in expected_data
     ]
 
+
 @pytest.mark.parametrize(
     "test_name, schema, schema_transformation, body, expected_data",
     [
