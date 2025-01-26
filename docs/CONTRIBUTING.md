@@ -273,6 +273,8 @@ The Airbyte CDK defines common development tasks using [Poe the Poet](https://po
 Optionally, if you can [pre-install Poe](https://poethepoet.natn.io/installation.html) with `pipx install poethepoet` and then you will be able to run Poe tasks with the shorter `poe TASKNAME` syntax instead of `poetry run poe TASKNAME`.
 The Ruff configuration is stored in `ruff.toml` at the root of the repository. This file contains settings for line length, target Python version, and linting rules.
 
+The Ruff configuration is stored in `ruff.toml` at the root of the repository. This file contains settings for line length, target Python version, and linting rules.
+
 ## Auto-Generating the Declarative Schema File
 
 Low-code CDK models are generated from `sources/declarative/declarative_component_schema.yaml`. If the iteration you are working on includes changes to the models or the connector generator, you may need to regenerate them. To do that, you can run:
