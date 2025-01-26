@@ -14,25 +14,37 @@ import requests
 SERVICE_KEY_PREFIX = "$"
 
 
-def exclude_service_keys(mapping: Mapping[str, Any]) -> Mapping[str, Any]:
-    return {k: v for k, v in mapping.items() if not is_service_key(k)}
-
-
-def remove_service_keys(mapping: dict[str, Any]):  # type: ignore[no-untyped-def]
+def add_service_key(mapping: Mapping[str, Any], key:str, value:Any) -> dict[str, Any]:
     """
-    Modify the parameter by removing the service keys from it.
+    :param mapping: non-null mapping
+    :param key: the name of the key, not including any specific prefixes
+    :param value: the value to bind
+    :return: a non-null copy of the mappibg including a new key-value pair, where the key is prefixed as service field.
     """
-    for key in list(mapping.keys()):
-        if is_service_key(key):
-            mapping.pop(key)
+    result = dict(mapping)
+    result[SERVICE_KEY_PREFIX + key] = value
+    return result
 
+
+def exclude_service_keys(struct: Any) -> Any:
+    """
+    :param struct: any object/JSON structure
+    :return: a copy of struct without any service fields at any level of nesting
+    """
+    if isinstance(struct, dict):
+        return {k: exclude_service_keys(v) for k, v in struct.items() if not is_service_key(k)}
+    elif isinstance(struct, list):
+        return [exclude_service_keys(v) for v in struct]
+    else:
+        return struct
 
 def is_service_key(key: str) -> bool:
     return key.find(SERVICE_KEY_PREFIX) == 0
 
 
-def assert_service_keys_exist(mapping: Mapping[str, Any]):  # type: ignore[no-untyped-def]
-    assert mapping != exclude_service_keys(mapping), "The mapping should contain service keys"
+def remove_service_keys(records: Iterable[Mapping[str, Any]]) -> Iterable[Mapping[str, Any]]:
+    for record in records:
+        yield exclude_service_keys(record)
 
 
 @dataclass

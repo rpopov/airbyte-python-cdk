@@ -14,7 +14,7 @@ Thank you for being interested in contributing to Airbyte Python CDK! Here are s
 Here are some tips to get started using the project dependencies and development tools:
 
 1. Clone the CDK repo. If you will be testing connectors, you should clone the CDK into the same parent directory as `airbytehq/airbyte`, which contains the connector definitions.
-2. Make sure your Python version is 3.10 or 3.11
+2. Make sure your Python version is 3.11
 
 Fedora 41:
 
@@ -30,18 +30,10 @@ Fedora 41:
 sudo dnf install pip
 ```
 
-3. [Install pipx](https://pipx.pypa.io/stable/installation/)
-
-Fedora 41:
+3. [Install Poetry](https://python-poetry.org/docs/#):
 
 ```bash
-sudo dnf install pipx
-```
-
-4. [Install Poetry](https://python-poetry.org/docs/#):
-
-```bash
-pipx install poetry
+pip install poetry
 ```
 
 or
@@ -55,13 +47,28 @@ Fedora 41:
 sudo dnf install poetry
 ```
 
-5. In the **airbyte-python-cdk project** install [Poe the Poet](https://poethepoet.natn.io/) and unit tests' prerequisites:
+4 Use the Python 3.11 environment:
+
+```bash
+poetry env info
+# validate 3.11 is active
+
+# otherwise:
+poetry env list
+
+# Use the proper version:
+poetry env use /usr/bin/python3.11
+poetry env info
+# validate 3.11 referred
+```
+
+5 In the **airbyte-python-cdk project** install [Poe the Poet](https://poethepoet.natn.io/) and unit tests' prerequisites:
 
 ```bash
 poetry install --all-extras
 ```
 
-6. If your operating system is RHEL or compatible, execute:
+6 If your operating system is RHEL or compatible, execute:
 
 ```bash
 # just for the current session, until restart
@@ -95,11 +102,12 @@ the value of the **dockerImageTag** parameter.
 - Iterate on the CDK code locally.
 
 ### Run Unit Tests
+To see all available `ruff` options, run `poetry run ruff`.
 
 - `poetry run pytest` to run all unit tests.
 - `poetry run pytest -k <suite or test name>` to run specific unit tests.
 - `poetry run pytest-fast` to run the subset of PyTest tests, which are not flagged as `slow`. (It should take <5 min for fast tests only.)
-- `python -m pytest -s unit_tests` if you want to pass pytest options.
+- `poetry run pytest -s unit_tests` if you want to pass pytest options.
 
 ### Run Code Formatting
 
@@ -263,6 +271,7 @@ Note that the local CDK is injected at build time, so if you make changes, you m
 The Airbyte CDK defines common development tasks using [Poe the Poet](https://poethepoet.natn.io/). You can run `poetry run poe list` to see all available tasks. This will work after `poetry install --all-extras` without additional installations.
 
 Optionally, if you can [pre-install Poe](https://poethepoet.natn.io/installation.html) with `pipx install poethepoet` and then you will be able to run Poe tasks with the shorter `poe TASKNAME` syntax instead of `poetry run poe TASKNAME`.
+The Ruff configuration is stored in `ruff.toml` at the root of the repository. This file contains settings for line length, target Python version, and linting rules.
 
 ## Auto-Generating the Declarative Schema File
 

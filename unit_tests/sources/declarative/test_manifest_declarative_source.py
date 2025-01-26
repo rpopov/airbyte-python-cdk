@@ -16,6 +16,7 @@ import requests
 import yaml
 from jsonschema.exceptions import ValidationError
 
+import unit_tests.sources.declarative.external_component  # Needed for dynamic imports to work
 from airbyte_cdk.models import (
     AirbyteLogMessage,
     AirbyteMessage,
@@ -134,9 +135,7 @@ class TestManifestDeclarativeSource:
 
     @pytest.fixture
     def _dynamic_declarative_stream(self, _declarative_stream):
-        """
-        Generates a DynamicDeclarativeStream configuration.
-        """
+        """Generates a DynamicDeclarativeStream configuration."""
         return {
             "type": "DynamicDeclarativeStream",
             "stream_template": _declarative_stream(),
@@ -266,6 +265,11 @@ class TestManifestDeclarativeSource:
             ],
             "check": {"type": "CheckStream", "stream_names": ["lists"]},
         }
+        assert "unit_tests" in sys.modules
+        assert "unit_tests.sources" in sys.modules
+        assert "unit_tests.sources.declarative" in sys.modules
+        assert "unit_tests.sources.declarative.external_component" in sys.modules
+
         source = ManifestDeclarativeSource(source_config=manifest)
 
         check_stream = source.connection_checker
@@ -1770,7 +1774,6 @@ def test_read_manifest_declarative_source(
         output_data = [
             message.record.data for message in _run_read(manifest, _stream_name) if message.record
         ]
-
         assert output_data == expected_records
         mock_retriever.assert_has_calls(expected_calls)
 
