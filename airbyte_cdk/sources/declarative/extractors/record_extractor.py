@@ -40,7 +40,7 @@ def exclude_service_keys(struct: Any) -> Any:
 
 
 def is_service_key(key: str) -> bool:
-    return key.find(SERVICE_KEY_PREFIX) == 0
+    return key.startswith(SERVICE_KEY_PREFIX)
 
 
 def remove_service_keys(records: Iterable[Mapping[str, Any]]) -> Iterable[Mapping[str, Any]]:
