@@ -13,15 +13,7 @@ Thank you for being interested in contributing to Airbyte Python CDK! Here are s
 
 Here are some tips to get started using the project dependencies and development tools:
 
-1. Clone the CDK repo. If you will be testing connectors, you should clone the CDK into the same parent directory as `airbytehq/airbyte`, which contains the connector definitions.
 1. Make sure your Python version is 3.11
-1. Make sure [Poetry is installed](https://python-poetry.org/docs/#) (version 2.0 or higher).
-1. Run `poetry install --all-extras`.
-1. Unit tests can be run via `poetry run pytest`.
-
-Note: By default in Poetry 2.0, `poetry lock` only refreshes the lockfile without pulling new versions. This is the same behavior as the previous `poetry lock --no-update` command.
-1. You can use "Poe" tasks to perform common actions such as lint checks (`poetry run poe lint`), autoformatting (`poetry run poe format-fix`), etc. For a list of tasks you can run, try `poetry run poe list`.
-
 
 Fedora 41:
 
@@ -37,7 +29,7 @@ Fedora 41:
 sudo dnf install pip
 ```
 
-3. [Install Poetry](https://python-poetry.org/docs/#):
+3. [Install Poetry](https://python-poetry.org/docs/#) 2.0 or higher:
 
 ```bash
 pip install poetry
@@ -53,6 +45,7 @@ Fedora 41:
 ```bash
 sudo dnf install poetry
 ```
+Note: You can use "Poe" tasks to perform common actions such as lint checks (`poetry run poe lint`), autoformatting (`poetry run poe format-fix`), etc. For a list of tasks you can run, try `poetry run poe list`. See [Poe the Poet](https://poethepoet.natn.io/)
 
 4 Use the Python 3.11 environment:
 
@@ -69,13 +62,15 @@ poetry env info
 # validate 3.11 referred
 ```
 
-5 In the **airbyte-python-cdk project** install [Poe the Poet](https://poethepoet.natn.io/) and unit tests' prerequisites:
+5. Clone the CDK repo. If you will be testing connectors, you should clone the CDK into the same parent directory as `airbytehq/airbyte`, which contains the connector definitions.
+6. In the **airbyte-python-cdk project** install the unit tests' prerequisites:
 
 ```bash
 poetry install --all-extras
 ```
+Note: By default in Poetry 2.0, `poetry lock` only refreshes the lockfile without pulling new versions. This is the same behavior as the previous `poetry lock --no-update` command.
 
-6 If your operating system is RHEL or compatible, execute:
+7 If your operating system is RHEL or compatible, execute:
 
 ```bash
 # just for the current session, until restart
@@ -90,12 +85,12 @@ See also:
 - [Dager-Podman Integration](https://blog.playgroundtech.io/introduction-to-dagger-6ab55ee28723)
 - [CDK Issue 197](https://github.com/airbytehq/airbyte-python-cdk/issues/197)
 
-7. Make sure Docker is installed locally, instead of Podman
+8. Make sure Docker is installed locally, instead of Podman
    See also:
 
 - [CDK Issue 197](https://github.com/airbytehq/airbyte-python-cdk/issues/197)
 
-8. Edit airbyte/airbyte-integrations/connectors/source-shopify/acceptance-test-config.yml and change:
+9. Edit airbyte/airbyte-integrations/connectors/source-shopify/acceptance-test-config.yml and change:
 
 ```
    connector_image: airbyte/source-shopify:dev    to    connector_image: airbyte/source-shopify:<version>
@@ -278,8 +273,6 @@ Note that the local CDK is injected at build time, so if you make changes, you m
 The Airbyte CDK defines common development tasks using [Poe the Poet](https://poethepoet.natn.io/). You can run `poetry run poe list` to see all available tasks. This will work after `poetry install --all-extras` without additional installations.
 
 Optionally, if you can [pre-install Poe](https://poethepoet.natn.io/installation.html) with `pipx install poethepoet` and then you will be able to run Poe tasks with the shorter `poe TASKNAME` syntax instead of `poetry run poe TASKNAME`.
-The Ruff configuration is stored in `ruff.toml` at the root of the repository. This file contains settings for line length, target Python version, and linting rules.
-
 The Ruff configuration is stored in `ruff.toml` at the root of the repository. This file contains settings for line length, target Python version, and linting rules.
 
 ## Auto-Generating the Declarative Schema File
