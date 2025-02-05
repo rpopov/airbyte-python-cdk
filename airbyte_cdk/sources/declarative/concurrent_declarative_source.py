@@ -19,6 +19,7 @@ from airbyte_cdk.sources.declarative.extractors import RecordSelector
 from airbyte_cdk.sources.declarative.extractors.record_filter import (
     ClientSideIncrementalRecordFilterDecorator,
 )
+from airbyte_cdk.sources.declarative.incremental import ConcurrentPerPartitionCursor
 from airbyte_cdk.sources.declarative.incremental.datetime_based_cursor import DatetimeBasedCursor
 from airbyte_cdk.sources.declarative.incremental.per_partition_with_global import (
     PerPartitionWithGlobalCursor,
@@ -231,7 +232,7 @@ class ConcurrentDeclarativeSource(ManifestDeclarativeSource, Generic[TState]):
                     ):
                         cursor = declarative_stream.retriever.stream_slicer.stream_slicer
 
-                        if not isinstance(cursor, ConcurrentCursor):
+                        if not isinstance(cursor, ConcurrentCursor | ConcurrentPerPartitionCursor):
                             # This should never happen since we instantiate ConcurrentCursor in
                             # model_to_component_factory.py
                             raise ValueError(
@@ -474,10 +475,21 @@ class ConcurrentDeclarativeSource(ManifestDeclarativeSource, Generic[TState]):
             # Also a temporary hack. In the legacy Stream implementation, as part of the read,
             # set_initial_state() is called to instantiate incoming state on the cursor. Although we no
             # longer rely on the legacy low-code cursor for concurrent checkpointing, low-code components
-            # like StopConditionPaginationStrategyDecorator and ClientSideIncrementalRecordFilterDecorator
-            # still rely on a DatetimeBasedCursor that is properly initialized with state.
+            # like StopConditionPaginationStrategyDecorator still rely on a DatetimeBasedCursor that is
+            # properly initialized with state.
             if retriever.cursor:
                 retriever.cursor.set_initial_state(stream_state=stream_state)
+
+            # Similar to above, the ClientSideIncrementalRecordFilterDecorator cursor is a separate instance
+            # from the one initialized on the SimpleRetriever, so it also must also have state initialized
+            # for semi-incremental streams using is_client_side_incremental to filter properly
+            if isinstance(retriever.record_selector, RecordSelector) and isinstance(
+                retriever.record_selector.record_filter, ClientSideIncrementalRecordFilterDecorator
+            ):
+                retriever.record_selector.record_filter._cursor.set_initial_state(
+                    stream_state=stream_state
+                )  # type: ignore  # After non-concurrent cursors are deprecated we can remove these cursor workarounds
+
             # We zero it out here, but since this is a cursor reference, the state is still properly
             # instantiated for the other components that reference it
             retriever.cursor = None
