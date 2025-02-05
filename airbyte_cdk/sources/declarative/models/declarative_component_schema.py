@@ -59,6 +59,11 @@ class CheckDynamicStream(BaseModel):
         description="Numbers of the streams to try reading from when running a check operation.",
         title="Stream Count",
     )
+    use_check_availability: Optional[bool] = Field(
+        True,
+        description="Enables stream check availability. This field is automatically set by the CDK.",
+        title="Use Check Availability",
+    )
 
 
 class ConcurrencyLevel(BaseModel):
@@ -653,6 +658,22 @@ class DpathExtractor(BaseModel):
     parameters: Optional[Dict[str, Any]] = Field(None, alias="$parameters")
 
 
+class DpathEnhancingExtractor(BaseModel):
+    type: Literal["DpathEnhancingExtractor"]
+    field_path: List[str] = Field(
+        ...,
+        description='List of potentially nested fields describing the full path of the field to extract. Use "*" to extract all values from an array. See more info in the [docs](https://docs.airbyte.com/connector-development/config-based/understanding-the-yaml-file/record-selector).',
+        examples=[
+            ["data"],
+            ["data", "records"],
+            ["data", "{{ parameters.name }}"],
+            ["data", "*", "record"],
+        ],
+        title="Field Path",
+    )
+    parameters: Optional[Dict[str, Any]] = Field(None, alias="$parameters")
+
+
 class ResponseToFileExtractor(BaseModel):
     type: Literal["ResponseToFileExtractor"]
     parameters: Optional[Dict[str, Any]] = Field(None, alias="$parameters")
@@ -1195,11 +1216,17 @@ class InjectInto(Enum):
 
 class RequestOption(BaseModel):
     type: Literal["RequestOption"]
-    field_name: str = Field(
-        ...,
-        description="Configures which key should be used in the location that the descriptor is being injected into",
+    field_name: Optional[str] = Field(
+        None,
+        description="Configures which key should be used in the location that the descriptor is being injected into. We hope to eventually deprecate this field in favor of `field_path` for all request_options, but must currently maintain it for backwards compatibility in the Builder.",
         examples=["segment_id"],
-        title="Request Option",
+        title="Field Name",
+    )
+    field_path: Optional[List[str]] = Field(
+        None,
+        description="Configures a path to be used for nested structures in JSON body requests (e.g. GraphQL queries)",
+        examples=[["data", "viewer", "id"]],
+        title="Field Path",
     )
     inject_into: InjectInto = Field(
         ...,
@@ -1655,7 +1682,7 @@ class ListPartitionRouter(BaseModel):
 
 class RecordSelector(BaseModel):
     type: Literal["RecordSelector"]
-    extractor: Union[CustomRecordExtractor, DpathExtractor]
+    extractor: Union[CustomRecordExtractor, DpathExtractor, DpathEnhancingExtractor]
     record_filter: Optional[Union[CustomRecordFilter, RecordFilter]] = Field(
         None,
         description="Responsible for filtering records to be emitted by the Source.",
