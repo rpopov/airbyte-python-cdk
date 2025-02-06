@@ -101,7 +101,7 @@ the value of the **dockerImageTag** parameter.
 
 ## Local development
 
-- Iterate on the CDK code locally.
+Iterate on the CDK code locally.
 
 ### Run Unit Tests
 To see all available `ruff` options, run `poetry run ruff`.
