@@ -95,10 +95,7 @@ See also:
 8. Make sure Docker is installed locally, instead of Podman
    See also:
 
-```bash
-curl -sSL https://install.python-poetry.org | python3 -
-```
-Fedora 41:
+- [CDK Issue 197](https://github.com/airbytehq/airbyte-python-cdk/issues/197)
 
 9. Edit airbyte/airbyte-integrations/connectors/source-shopify/acceptance-test-config.yml and change:
 
