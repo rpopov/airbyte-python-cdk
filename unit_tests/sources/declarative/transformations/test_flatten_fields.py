@@ -111,6 +111,7 @@ _DO_NOT_FLATTEN_LISTS = False
                 "List.1": "Item2",
                 "List.2": "Item3",
             },
+            id="flatten record bypasses the service fields",
         ),
         pytest.param(
             _FLATTEN_LISTS,
@@ -121,6 +122,7 @@ _DO_NOT_FLATTEN_LISTS = False
                 "List.1": "Item2",
                 "List.2": "Item3",
             },
+            id="flatten record with nested records bypasses the service fields",
         ),
     ],
 )

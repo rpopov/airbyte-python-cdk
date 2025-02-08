@@ -5,7 +5,7 @@ Learn how you can become a contributor to the Airbyte Python CDK.
 Thank you for being interested in contributing to Airbyte Python CDK! Here are some guidelines to get you started:
 
 - We adhere to the Airbyte [code of conduct](https://docs.airbyte.com/community/code-of-conduct).
-- You can contribute by reporting bugs, posting github discussions, opening issues, improving docs, and submitting pull requests with bugfixes and new features alike.
+- You can contribute by reporting bugs, posting GitHub discussions, opening issues, improving docs, and submitting pull requests with bug fixes and new features.
 - If you're changing the code, please add unit tests for your change.
 - When submitting issues or PRs, please add a small reproduction project. Using the changes in your connector and providing that connector code as an example (or a satellite PR) helps!
 
@@ -13,8 +13,7 @@ Thank you for being interested in contributing to Airbyte Python CDK! Here are s
 
 Here are some tips to get started using the project dependencies and development tools:
 
-1. Clone the CDK repo. If you will be testing connectors, you should clone the CDK into the same parent directory as `airbytehq/airbyte`, which contains the connector definitions.
-2. Make sure your Python version is 3.11
+1. Make sure your Python version is 3.11
 
 Fedora 41:
 
@@ -30,7 +29,7 @@ Fedora 41:
 sudo dnf install pip
 ```
 
-3. [Install Poetry](https://python-poetry.org/docs/#):
+3. [Install Poetry](https://python-poetry.org/docs/#) 2.0 or higher:
 
 ```bash
 pip install poetry
@@ -46,6 +45,7 @@ Fedora 41:
 ```bash
 sudo dnf install poetry
 ```
+Note: You can use "Poe" tasks to perform common actions such as lint checks (`poetry run poe lint`), autoformatting (`poetry run poe format-fix`), etc. For a list of tasks you can run, try `poetry run poe list`. See [Poe the Poet](https://poethepoet.natn.io/)
 
 4 Use the Python 3.11 environment:
 
@@ -62,13 +62,22 @@ poetry env info
 # validate 3.11 referred
 ```
 
-5 In the **airbyte-python-cdk project** install [Poe the Poet](https://poethepoet.natn.io/) and unit tests' prerequisites:
+5. Clone the CDK repo. If you will be testing connectors, you should clone the CDK into the same parent directory as `airbytehq/airbyte`, which contains the connector definitions.
+6. In the **airbyte-python-cdk project** install the unit tests' prerequisites:
 
 ```bash
 poetry install --all-extras
 ```
+Note: By default in Poetry 2.0, `poetry lock` only refreshes the lockfile without pulling new versions. This is the same behavior as the previous `poetry lock --no-update` command.
+1. You can use "Poe" tasks to perform common actions such as lint checks (`poetry run poe lint`), autoformatting (`poetry run poe format-fix`), etc. For a list of tasks you can run, try `poetry run poe list`.
 
-6 If your operating system is RHEL or compatible, execute:
+7 If your operating system is RHEL or compatible, execute:
+
+```bash
+# just for the current session, until restart
+sudo modprobe iptable_nat
+
+Fedora 41:
 
 ```bash
 # just for the current session, until restart
@@ -83,12 +92,15 @@ See also:
 - [Dager-Podman Integration](https://blog.playgroundtech.io/introduction-to-dagger-6ab55ee28723)
 - [CDK Issue 197](https://github.com/airbytehq/airbyte-python-cdk/issues/197)
 
-7. Make sure Docker is installed locally, instead of Podman
+8. Make sure Docker is installed locally, instead of Podman
    See also:
 
-- [CDK Issue 197](https://github.com/airbytehq/airbyte-python-cdk/issues/197)
+```bash
+curl -sSL https://install.python-poetry.org | python3 -
+```
+Fedora 41:
 
-8. Edit airbyte/airbyte-integrations/connectors/source-shopify/acceptance-test-config.yml and change:
+9. Edit airbyte/airbyte-integrations/connectors/source-shopify/acceptance-test-config.yml and change:
 
 ```
    connector_image: airbyte/source-shopify:dev    to    connector_image: airbyte/source-shopify:<version>
