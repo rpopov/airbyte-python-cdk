@@ -939,6 +939,17 @@ class ModelToComponentFactory:
             parameters={},
         )
 
+    @staticmethod
+    def apply_stream_state_migrations(
+        stream_state_migrations: List[Any] | None, stream_state: MutableMapping[str, Any]
+    ) -> MutableMapping[str, Any]:
+        if stream_state_migrations:
+            for state_migration in stream_state_migrations:
+                if state_migration.should_migrate(stream_state):
+                    # The state variable is expected to be mutable but the migrate method returns an immutable mapping.
+                    stream_state = dict(state_migration.migrate(stream_state))
+        return stream_state
+
     def create_concurrent_cursor_from_datetime_based_cursor(
         self,
         model_type: Type[BaseModel],
@@ -948,6 +959,7 @@ class ModelToComponentFactory:
         config: Config,
         message_repository: Optional[MessageRepository] = None,
         runtime_lookback_window: Optional[datetime.timedelta] = None,
+        stream_state_migrations: Optional[List[Any]] = None,
         **kwargs: Any,
     ) -> ConcurrentCursor:
         # Per-partition incremental streams can dynamically create child cursors which will pass their current
@@ -958,6 +970,7 @@ class ModelToComponentFactory:
             if "stream_state" not in kwargs
             else kwargs["stream_state"]
         )
+        stream_state = self.apply_stream_state_migrations(stream_state_migrations, stream_state)
 
         component_type = component_definition.get("type")
         if component_definition.get("type") != model_type.__name__:
@@ -1193,6 +1206,7 @@ class ModelToComponentFactory:
         config: Config,
         stream_state: MutableMapping[str, Any],
         partition_router: PartitionRouter,
+        stream_state_migrations: Optional[List[Any]] = None,
         **kwargs: Any,
     ) -> ConcurrentPerPartitionCursor:
         component_type = component_definition.get("type")
@@ -1241,8 +1255,10 @@ class ModelToComponentFactory:
                 stream_namespace=stream_namespace,
                 config=config,
                 message_repository=NoopMessageRepository(),
+                stream_state_migrations=stream_state_migrations,
             )
         )
+        stream_state = self.apply_stream_state_migrations(stream_state_migrations, stream_state)
 
         # Return the concurrent cursor and state converter
         return ConcurrentPerPartitionCursor(
@@ -1751,6 +1767,7 @@ class ModelToComponentFactory:
                     stream_name=model.name or "",
                     stream_namespace=None,
                     config=config or {},
+                    stream_state_migrations=model.state_migrations,
                 )
             return (
                 self._create_component_from_model(model=model.incremental_sync, config=config)
