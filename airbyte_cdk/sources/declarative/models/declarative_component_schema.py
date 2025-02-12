@@ -887,15 +887,6 @@ class CustomDecoder(BaseModel):
     parameters: Optional[Dict[str, Any]] = Field(None, alias="$parameters")
 
 
-class GzipJsonDecoder(BaseModel):
-    class Config:
-        extra = Extra.allow
-
-    type: Literal["GzipJsonDecoder"]
-    encoding: Optional[str] = "utf-8"
-    parameters: Optional[Dict[str, Any]] = Field(None, alias="$parameters")
-
-
 class MinMaxDatetime(BaseModel):
     type: Literal["MinMaxDatetime"]
     datetime: str = Field(
@@ -1274,18 +1265,8 @@ class LegacySessionTokenAuthenticator(BaseModel):
     parameters: Optional[Dict[str, Any]] = Field(None, alias="$parameters")
 
 
-class JsonParser(BaseModel):
-    type: Literal["JsonParser"]
-    encoding: Optional[str] = "utf-8"
-
-
-class JsonLineParser(BaseModel):
-    type: Literal["JsonLineParser"]
-    encoding: Optional[str] = "utf-8"
-
-
-class CsvParser(BaseModel):
-    type: Literal["CsvParser"]
+class CsvDecoder(BaseModel):
+    type: Literal["CsvDecoder"]
     encoding: Optional[str] = "utf-8"
     delimiter: Optional[str] = ","
 
@@ -1680,9 +1661,9 @@ class RecordSelector(BaseModel):
     parameters: Optional[Dict[str, Any]] = Field(None, alias="$parameters")
 
 
-class GzipParser(BaseModel):
-    type: Literal["GzipParser"]
-    inner_parser: Union[JsonLineParser, CsvParser, JsonParser]
+class GzipDecoder(BaseModel):
+    type: Literal["GzipDecoder"]
+    decoder: Union[CsvDecoder, GzipDecoder, JsonDecoder, JsonlDecoder]
 
 
 class Spec(BaseModel):
@@ -1720,16 +1701,11 @@ class ZipfileDecoder(BaseModel):
         extra = Extra.allow
 
     type: Literal["ZipfileDecoder"]
-    parser: Union[GzipParser, JsonParser, JsonLineParser, CsvParser] = Field(
+    decoder: Union[CsvDecoder, GzipDecoder, JsonDecoder, JsonlDecoder] = Field(
         ...,
         description="Parser to parse the decompressed data from the zipfile(s).",
         title="Parser",
     )
-
-
-class CompositeRawDecoder(BaseModel):
-    type: Literal["CompositeRawDecoder"]
-    parser: Union[GzipParser, JsonParser, JsonLineParser, CsvParser]
 
 
 class DeclarativeSource1(BaseModel):
@@ -1933,7 +1909,7 @@ class SessionTokenAuthenticator(BaseModel):
         description="Authentication method to use for requests sent to the API, specifying how to inject the session token.",
         title="Data Request Authentication",
     )
-    decoder: Optional[Union[JsonDecoder, XmlDecoder, CompositeRawDecoder]] = Field(
+    decoder: Optional[Union[JsonDecoder, XmlDecoder]] = Field(
         None, description="Component used to decode the response.", title="Decoder"
     )
     parameters: Optional[Dict[str, Any]] = Field(None, alias="$parameters")
@@ -2133,12 +2109,12 @@ class SimpleRetriever(BaseModel):
     decoder: Optional[
         Union[
             CustomDecoder,
+            CsvDecoder,
+            GzipDecoder,
             JsonDecoder,
             JsonlDecoder,
             IterableDecoder,
             XmlDecoder,
-            GzipJsonDecoder,
-            CompositeRawDecoder,
             ZipfileDecoder,
         ]
     ] = Field(
@@ -2211,12 +2187,12 @@ class AsyncRetriever(BaseModel):
     decoder: Optional[
         Union[
             CustomDecoder,
+            CsvDecoder,
+            GzipDecoder,
             JsonDecoder,
             JsonlDecoder,
             IterableDecoder,
             XmlDecoder,
-            GzipJsonDecoder,
-            CompositeRawDecoder,
             ZipfileDecoder,
         ]
     ] = Field(
@@ -2227,12 +2203,12 @@ class AsyncRetriever(BaseModel):
     download_decoder: Optional[
         Union[
             CustomDecoder,
+            CsvDecoder,
+            GzipDecoder,
             JsonDecoder,
             JsonlDecoder,
             IterableDecoder,
             XmlDecoder,
-            GzipJsonDecoder,
-            CompositeRawDecoder,
             ZipfileDecoder,
         ]
     ] = Field(
@@ -2277,6 +2253,7 @@ class DynamicDeclarativeStream(BaseModel):
 
 
 ComplexFieldType.update_forward_refs()
+GzipDecoder.update_forward_refs()
 CompositeErrorHandler.update_forward_refs()
 DeclarativeSource1.update_forward_refs()
 DeclarativeSource2.update_forward_refs()
