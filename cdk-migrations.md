@@ -1,8 +1,8 @@
 # CDK Migration Guide
 
-## Upgrading to 6.X.X
+## Upgrading to 6.34.0
 
-Version 6.X.X of the CDK removes support for `stream_state` in the Jinja interpolation context. This change is breaking for any low-code connectors that use `stream_state` in the interpolation context.
+[Version 6.34.0](https://github.com/airbytehq/airbyte-python-cdk/releases/tag/v6.34.0) of the CDK removes support for `stream_state` in the Jinja interpolation context. This change is breaking for any low-code connectors that use `stream_state` in the interpolation context.
 
 The following components are impacted by this change:
 
