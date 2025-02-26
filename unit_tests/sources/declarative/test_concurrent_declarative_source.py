@@ -299,7 +299,7 @@ _MANIFEST = {
                     "timeout": ["timeout"],
                     "completed": ["ready"],
                 },
-                "urls_extractor": {"type": "DpathExtractor", "field_path": ["urls"]},
+                "download_target_extractor": {"type": "DpathExtractor", "field_path": ["urls"]},
                 "record_selector": {
                     "type": "RecordSelector",
                     "extractor": {"type": "DpathExtractor", "field_path": []},
@@ -307,7 +307,7 @@ _MANIFEST = {
                 "status_extractor": {"type": "DpathExtractor", "field_path": ["status"]},
                 "polling_requester": {
                     "type": "HttpRequester",
-                    "path": "/async_job/{{stream_slice['create_job_response'].json()['id'] }}",
+                    "path": "/async_job/{{creation_response['id'] }}",
                     "http_method": "GET",
                     "authenticator": {
                         "type": "BearerAuthenticator",

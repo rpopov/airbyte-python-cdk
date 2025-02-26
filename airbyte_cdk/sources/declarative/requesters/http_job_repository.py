@@ -43,13 +43,13 @@ class AsyncHttpJobRepository(AsyncJobRepository):
     delete_requester: Optional[Requester]
     status_extractor: DpathExtractor
     status_mapping: Mapping[str, AsyncJobStatus]
-    urls_extractor: DpathExtractor
+    download_target_extractor: DpathExtractor
 
     job_timeout: Optional[timedelta] = None
     record_extractor: RecordExtractor = field(
         init=False, repr=False, default_factory=lambda: ResponseToFileExtractor({})
     )
-    url_requester: Optional[Requester] = (
+    download_target_requester: Optional[Requester] = (
         None  # use it in case polling_requester provides some <id> and extra request is needed to obtain list of urls to download from
     )
 
@@ -211,12 +211,15 @@ class AsyncHttpJobRepository(AsyncJobRepository):
 
         """
 
-        for url in self._get_download_url(job):
+        for target_url in self._get_download_targets(job):
             job_slice = job.job_parameters()
             stream_slice = StreamSlice(
                 partition=job_slice.partition,
                 cursor_slice=job_slice.cursor_slice,
-                extra_fields={**job_slice.extra_fields, "url": url},
+                extra_fields={
+                    **job_slice.extra_fields,
+                    "download_target": target_url,
+                },
             )
             for message in self.download_retriever.read_records({}, stream_slice):
                 if isinstance(message, Record):
@@ -269,27 +272,29 @@ class AsyncHttpJobRepository(AsyncJobRepository):
         del self._polling_job_response_by_id[job_id]
 
     def _get_create_job_stream_slice(self, job: AsyncJob) -> StreamSlice:
+        creation_response = self._create_job_response_by_id[job.api_job_id()].json()
         stream_slice = StreamSlice(
-            partition={"create_job_response": self._create_job_response_by_id[job.api_job_id()]},
+            partition={},
             cursor_slice={},
+            extra_fields={"creation_response": creation_response},
         )
         return stream_slice
 
-    def _get_download_url(self, job: AsyncJob) -> Iterable[str]:
-        if not self.url_requester:
+    def _get_download_targets(self, job: AsyncJob) -> Iterable[str]:
+        if not self.download_target_requester:
             url_response = self._polling_job_response_by_id[job.api_job_id()]
         else:
+            polling_response = self._polling_job_response_by_id[job.api_job_id()].json()
             stream_slice: StreamSlice = StreamSlice(
-                partition={
-                    "polling_job_response": self._polling_job_response_by_id[job.api_job_id()]
-                },
+                partition={},
                 cursor_slice={},
+                extra_fields={"polling_response": polling_response},
             )
-            url_response = self.url_requester.send_request(stream_slice=stream_slice)  # type: ignore # we expect url_requester to always be presented, otherwise raise an exception as we cannot proceed with the report
+            url_response = self.download_target_requester.send_request(stream_slice=stream_slice)  # type: ignore # we expect download_target_requester to always be presented, otherwise raise an exception as we cannot proceed with the report
             if not url_response:
                 raise AirbyteTracedException(
-                    internal_message="Always expect a response or an exception from url_requester",
+                    internal_message="Always expect a response or an exception from download_target_requester",
                     failure_type=FailureType.system_error,
                 )
 
-        yield from self.urls_extractor.extract_records(url_response)  # type: ignore # we expect urls_extractor to always return list of strings
+        yield from self.download_target_extractor.extract_records(url_response)  # type: ignore # we expect download_target_extractor to always return list of strings
