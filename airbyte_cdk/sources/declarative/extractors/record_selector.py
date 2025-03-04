@@ -17,6 +17,7 @@ from airbyte_cdk.sources.declarative.extractors.type_transformer import (
     TypeTransformer as DeclarativeTypeTransformer,
 )
 from airbyte_cdk.sources.declarative.interpolation import InterpolatedString
+from airbyte_cdk.sources.declarative.models import SchemaNormalization
 from airbyte_cdk.sources.declarative.transformations import RecordTransformation
 from airbyte_cdk.sources.types import Config, Record, StreamSlice, StreamState
 from airbyte_cdk.sources.utils.transform import TypeTransformer
@@ -43,6 +44,7 @@ class RecordSelector(HttpSelector):
     _name: Union[InterpolatedString, str] = field(init=False, repr=False, default="")
     record_filter: Optional[RecordFilter] = None
     transformations: List[RecordTransformation] = field(default_factory=lambda: [])
+    transform_before_filtering: bool = False
 
     def __post_init__(self, parameters: Mapping[str, Any]) -> None:
         self._parameters = parameters
@@ -106,10 +108,19 @@ class RecordSelector(HttpSelector):
         Until we decide to move this logic away from the selector, we made this method public so that users like AsyncJobRetriever could
         share the logic of doing transformations on a set of records.
         """
-        filtered_data = self._filter(all_data, stream_state, stream_slice, next_page_token)
-        transformed_data = self._transform(filtered_data, stream_state, stream_slice)
+        if self.transform_before_filtering:
+            transformed_data = self._transform(all_data, stream_state, stream_slice)
+            transformed_filtered_data = self._filter(
+                transformed_data, stream_state, stream_slice, next_page_token
+            )
+        else:
+            filtered_data = self._filter(all_data, stream_state, stream_slice, next_page_token)
+            transformed_filtered_data = self._transform(filtered_data, stream_state, stream_slice)
+
         no_service_fields_data = remove_service_keys(transformed_data)
-        normalized_data = self._normalize_by_schema(no_service_fields_data, schema=records_schema)
+        normalized_data = self._normalize_by_schema(
+            no_service_fields_data, schema=records_schema
+        )
         for data in normalized_data:
             yield Record(data=data, stream_name=self.name, associated_slice=stream_slice)
 

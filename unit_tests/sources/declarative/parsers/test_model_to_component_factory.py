@@ -142,6 +142,7 @@ from airbyte_cdk.sources.declarative.spec import Spec
 from airbyte_cdk.sources.declarative.transformations import AddFields, RemoveFields
 from airbyte_cdk.sources.declarative.transformations.add_fields import AddedFieldDefinition
 from airbyte_cdk.sources.declarative.yaml_declarative_source import YamlDeclarativeSource
+from airbyte_cdk.sources.streams.call_rate import MovingWindowCallRatePolicy
 from airbyte_cdk.sources.streams.concurrent.clamping import (
     ClampingEndProvider,
     DayClampingStrategy,
@@ -1193,6 +1194,8 @@ list_stream:
         stream.retriever.record_selector.record_filter, ClientSideIncrementalRecordFilterDecorator
     )
 
+    assert stream.retriever.record_selector.transform_before_filtering == True
+
 
 def test_client_side_incremental_with_partition_router():
     content = """
@@ -1273,6 +1276,7 @@ list_stream:
     assert isinstance(
         stream.retriever.record_selector.record_filter, ClientSideIncrementalRecordFilterDecorator
     )
+    assert stream.retriever.record_selector.transform_before_filtering == True
     assert isinstance(
         stream.retriever.record_selector.record_filter._cursor,
         PerPartitionWithGlobalCursor,
@@ -3603,7 +3607,7 @@ def test_create_async_retriever():
             "timeout": ["timeout"],
             "completed": ["ready"],
         },
-        "urls_extractor": {"type": "DpathExtractor", "field_path": ["urls"]},
+        "download_target_extractor": {"type": "DpathExtractor", "field_path": ["urls"]},
         "record_selector": {
             "type": "RecordSelector",
             "extractor": {"type": "DpathExtractor", "field_path": ["data"]},
@@ -3611,7 +3615,7 @@ def test_create_async_retriever():
         "status_extractor": {"type": "DpathExtractor", "field_path": ["status"]},
         "polling_requester": {
             "type": "HttpRequester",
-            "path": "/v3/marketing/contacts/exports/{{stream_slice['create_job_response'].json()['id'] }}",
+            "path": "/v3/marketing/contacts/exports/{{creation_response['id'] }}",
             "url_base": "https://api.sendgrid.com",
             "http_method": "GET",
             "authenticator": {
@@ -3631,19 +3635,19 @@ def test_create_async_retriever():
         },
         "download_requester": {
             "type": "HttpRequester",
-            "path": "{{stream_slice['url']}}",
+            "path": "{{download_target}}",
             "url_base": "",
             "http_method": "GET",
         },
         "abort_requester": {
             "type": "HttpRequester",
-            "path": "{{stream_slice['url']}}/abort",
+            "path": "{{download_target}}/abort",
             "url_base": "",
             "http_method": "POST",
         },
         "delete_requester": {
             "type": "HttpRequester",
-            "path": "{{stream_slice['url']}}",
+            "path": "{{download_target}}",
             "url_base": "",
             "http_method": "POST",
         },
@@ -3677,10 +3681,162 @@ def test_create_async_retriever():
     assert job_repository.abort_requester
     assert job_repository.delete_requester
     assert job_repository.status_extractor
-    assert job_repository.urls_extractor
+    assert job_repository.download_target_extractor
 
     selector = component.record_selector
     extractor = selector.extractor
     assert isinstance(selector, RecordSelector)
     assert isinstance(extractor, DpathExtractor)
     assert extractor.field_path == ["data"]
+
+
+def test_api_budget():
+    manifest = {
+        "type": "DeclarativeSource",
+        "api_budget": {
+            "type": "HTTPAPIBudget",
+            "ratelimit_reset_header": "X-RateLimit-Reset",
+            "ratelimit_remaining_header": "X-RateLimit-Remaining",
+            "status_codes_for_ratelimit_hit": [429, 503],
+            "policies": [
+                {
+                    "type": "MovingWindowCallRatePolicy",
+                    "rates": [
+                        {
+                            "type": "Rate",
+                            "limit": 3,
+                            "interval": "PT0.1S",  # 0.1 seconds
+                        }
+                    ],
+                    "matchers": [
+                        {
+                            "type": "HttpRequestRegexMatcher",
+                            "method": "GET",
+                            "url_base": "https://api.sendgrid.com",
+                            "url_path_pattern": "/v3/marketing/lists",
+                        }
+                    ],
+                }
+            ],
+        },
+        "my_requester": {
+            "type": "HttpRequester",
+            "path": "/v3/marketing/lists",
+            "url_base": "https://api.sendgrid.com",
+            "http_method": "GET",
+            "authenticator": {
+                "type": "BasicHttpAuthenticator",
+                "username": "admin",
+                "password": "{{ config['password'] }}",
+            },
+        },
+    }
+
+    config = {
+        "password": "verysecrettoken",
+    }
+
+    factory = ModelToComponentFactory()
+    if "api_budget" in manifest:
+        factory.set_api_budget(manifest["api_budget"], config)
+
+    from airbyte_cdk.sources.declarative.models.declarative_component_schema import (
+        HttpRequester as HttpRequesterModel,
+    )
+
+    requester_definition = manifest["my_requester"]
+    assert requester_definition["type"] == "HttpRequester"
+
+    http_requester = factory.create_component(
+        model_type=HttpRequesterModel,
+        component_definition=requester_definition,
+        config=config,
+        name="lists_stream",
+        decoder=None,
+    )
+
+    assert http_requester.api_budget is not None
+    assert http_requester.api_budget._ratelimit_reset_header == "X-RateLimit-Reset"
+    assert http_requester.api_budget._status_codes_for_ratelimit_hit == [429, 503]
+    assert len(http_requester.api_budget._policies) == 1
+
+    # The single policy is a MovingWindowCallRatePolicy
+    policy = http_requester.api_budget._policies[0]
+    assert isinstance(policy, MovingWindowCallRatePolicy)
+    assert policy._bucket.rates[0].limit == 3
+    # The 0.1s from 'PT0.1S' is stored in ms by PyRateLimiter internally
+    # but here just check that the limit and interval exist
+    assert policy._bucket.rates[0].interval == 100  # 100 ms
+
+
+def test_api_budget_fixed_window_policy():
+    manifest = {
+        "type": "DeclarativeSource",
+        # Root-level api_budget referencing a FixedWindowCallRatePolicy
+        "api_budget": {
+            "type": "HTTPAPIBudget",
+            "policies": [
+                {
+                    "type": "FixedWindowCallRatePolicy",
+                    "period": "PT1M",  # 1 minute
+                    "call_limit": 10,
+                    "matchers": [
+                        {
+                            "type": "HttpRequestRegexMatcher",
+                            "method": "GET",
+                            "url_base": "https://example.org",
+                            "url_path_pattern": "/v2/data",
+                        }
+                    ],
+                }
+            ],
+        },
+        # We'll define a single HttpRequester that references that base
+        "my_requester": {
+            "type": "HttpRequester",
+            "path": "/v2/data",
+            "url_base": "https://example.org",
+            "http_method": "GET",
+            "authenticator": {"type": "NoAuth"},
+        },
+    }
+
+    config = {}
+
+    factory = ModelToComponentFactory()
+    if "api_budget" in manifest:
+        factory.set_api_budget(manifest["api_budget"], config)
+
+    from airbyte_cdk.sources.declarative.models.declarative_component_schema import (
+        HttpRequester as HttpRequesterModel,
+    )
+
+    requester_definition = manifest["my_requester"]
+    assert requester_definition["type"] == "HttpRequester"
+    http_requester = factory.create_component(
+        model_type=HttpRequesterModel,
+        component_definition=requester_definition,
+        config=config,
+        name="my_stream",
+        decoder=None,
+    )
+
+    assert http_requester.api_budget is not None
+    assert len(http_requester.api_budget._policies) == 1
+
+    from airbyte_cdk.sources.streams.call_rate import FixedWindowCallRatePolicy
+
+    policy = http_requester.api_budget._policies[0]
+    assert isinstance(policy, FixedWindowCallRatePolicy)
+    assert policy._call_limit == 10
+    # The period is "PT1M" => 60 seconds
+    assert policy._offset.total_seconds() == 60
+
+    assert len(policy._matchers) == 1
+    matcher = policy._matchers[0]
+    from airbyte_cdk.sources.streams.call_rate import HttpRequestRegexMatcher
+
+    assert isinstance(matcher, HttpRequestRegexMatcher)
+    assert matcher._method == "GET"
+    assert matcher._url_base == "https://example.org"
+    assert matcher._url_path_pattern.pattern == "/v2/data"
