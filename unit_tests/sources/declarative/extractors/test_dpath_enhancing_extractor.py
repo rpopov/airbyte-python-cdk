@@ -12,7 +12,6 @@ from airbyte_cdk import Decoder
 from airbyte_cdk.sources.declarative.decoders.json_decoder import (
     IterableDecoder,
     JsonDecoder,
-    JsonlDecoder,
 )
 from airbyte_cdk.sources.declarative.extractors.dpath_enhancing_extractor import (
     SERVICE_KEY_PARENT,
@@ -22,6 +21,7 @@ from airbyte_cdk.sources.declarative.extractors.dpath_enhancing_extractor import
 from airbyte_cdk.sources.declarative.extractors.record_extractor import (
     SERVICE_KEY_PREFIX,
 )
+from airbyte_cdk.sources.declarative.models.declarative_component_schema import JsonlDecoder
 
 ROOT = SERVICE_KEY_PREFIX + SERVICE_KEY_ROOT
 PARENT = SERVICE_KEY_PREFIX + SERVICE_KEY_PARENT
@@ -30,7 +30,6 @@ config = {"field": "record_array"}
 parameters = {"parameters_field": "record_array"}
 
 decoder_json = JsonDecoder(parameters={})
-decoder_jsonl = JsonlDecoder(parameters={})
 decoder_iterable = IterableDecoder(parameters={})
 
 

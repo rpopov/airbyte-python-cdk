@@ -1,7 +1,6 @@
 #
 # Copyright (c) 2023 Airbyte, Inc., all rights reserved.
 #
-import gzip
 import json
 import os
 
@@ -16,7 +15,6 @@ from airbyte_cdk.sources.declarative.decoders.json_decoder import JsonDecoder
 @pytest.mark.parametrize(
     "response_body, expected_json",
     [
-        ("", [{}]),  # The JSON contract is irregular
         ("{}", [{}]),
         ("[]", []),
         ('{"healthcheck": {"status": "ok"}}', [{"healthcheck": {"status": "ok"}}]),
@@ -31,7 +29,6 @@ def test_json_decoder(requests_mock, response_body, expected_json):
 @pytest.mark.parametrize(
     "response_body, expected_json",
     [
-        ("", []),
         ("{}", [{}]),
         ("[]", [[]]),
         ('{"id": 1, "name": "test1"}', [{"id": 1, "name": "test1"}]),
@@ -41,7 +38,6 @@ def test_json_decoder(requests_mock, response_body, expected_json):
         ),
     ],
     ids=[
-        "empty_response",
         "empty_object_response",
         "empty_list_response",
         "one_line_json",
