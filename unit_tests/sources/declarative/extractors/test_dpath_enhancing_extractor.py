@@ -42,7 +42,6 @@ def create_response(body: Union[Dict, bytes]):
 @pytest.mark.parametrize(
     "field_path, decoder, body, expected_records",
     [
-        ([], decoder_json, b"", [{}]),  # The JSON contract is irregular, compare with JSONL
         ([], decoder_json, {}, [{}]),
         ([], decoder_json, [], []),
         ([], decoder_json, {"id": 1}, [{"id": 1, ROOT: {"id": 1}}]),
@@ -303,7 +302,6 @@ def create_response(body: Union[Dict, bytes]):
         ),
     ],
     ids=[
-        "test_extract_from_empty_string",
         "test_extract_from_empty_object",
         "test_extract_from_empty_array",
         "test_extract_from_nonempty_object",

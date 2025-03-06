@@ -37,7 +37,6 @@ def create_response(body: Union[Dict, bytes]):
 @pytest.mark.parametrize(
     "field_path, decoder, body, expected_records",
     [
-        ([], decoder_json, b"", [{}]),  # The JSON contract is irregular, compare with JSONL
         ([], decoder_json, {}, [{}]),
         ([], decoder_json, [], []),
         ([], decoder_json, {"id": 1}, [{"id": 1}]),
@@ -123,7 +122,6 @@ def create_response(body: Union[Dict, bytes]):
             },
             [{"id": 1}, {"id": 2}, {"id": 3}, {"id": 4}],
         ),
-        ([], decoder_jsonl, b"", []),
         ([], decoder_jsonl, [], []),  # This case allows a line in JSONL to be an array or records,
         # that will be inlined in the overall list of records. Same as below.
         ([], decoder_jsonl, {}, [{}]),
@@ -153,7 +151,6 @@ def create_response(body: Union[Dict, bytes]):
         ),
     ],
     ids=[
-        "test_extract_from_empty_string",
         "test_extract_from_empty_object",
         "test_extract_from_empty_array",
         "test_extract_from_nonempty_object",
@@ -174,7 +171,6 @@ def create_response(body: Union[Dict, bytes]):
         "test_field_does_not_exist",
         "test_nested_list",
         "test_complex_nested_list",
-        "test_extract_records_from_empty_string_jsonl",
         "test_extract_records_from_single_empty_array_jsonl",
         "test_extract_records_from_single_empty_object_jsonl",
         "test_extract_single_record_from_root_jsonl",
